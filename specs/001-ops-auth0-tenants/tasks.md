@@ -150,8 +150,10 @@ sign-up attempt is refused (SC-002).
 ### Tests for User Story 2 (write first, must fail) ⚠️
 
 - [ ] T011 [US2] Via `ipx-fix` (RED commit): create
-  `repos/ipx/apps/ipx-ops/auth0/actions/restrict-to-ipxos-domain.test.ts` with
-  `// @vitest-environment node` on line 1. Load the source with
+  `repos/ipx/apps/ipx-ops/auth0/actions/restrict-to-ipxos-domain.test.ts` under the **default jsdom
+  environment**. Do not add a `// @vitest-environment node` pragma: `src/test/setup.ts` runs for every
+  test and calls `HTMLElement.prototype` without a guard, so a node-environment file throws before
+  any assertion runs (implementation-plan advisor round 1). Load the source with
   `createRequire(import.meta.url)('./restrict-to-ipxos-domain.cjs')`. Build a fake `event`
   (`{ user: { idp_tenant_domain } }`) and a spy `api` whose every member (`access.deny`,
   `idToken.setCustomClaim`, `accessToken.setCustomClaim`, `user.setAppMetadata`,
@@ -175,9 +177,12 @@ sign-up attempt is refused (SC-002).
   - A header comment cites ADR-0040 decision 5 and TRU.IAM.R63, and says the file is pasted verbatim
     into each tenant.
 
-  T011 passes (IPX-9497)
+  T011 passes. lint-staged's globs skip `.cjs`, so before the GREEN commit run
+  `pnpm exec oxfmt --write apps/ipx-ops/auth0/actions/restrict-to-ipxos-domain.cjs` and `pnpm lint`
+  (oxlint, `--max-warnings 0`) by hand (IPX-9497)
 - [ ] T013 [US2] Run the whole `ipx-ops` gate in `repos/ipx`:
-  - `pnpm --filter ipx-ops test`: no regressions against T003.
+  - `pnpm --filter @ipx/ipx-ops test:ci` (`vitest --run --coverage`, as CI runs it; plain `test`
+    is watch mode): no new failures beyond T003's two pre-existing ones.
   - `pnpm --filter ipx-ops typecheck`.
   - Formatting: `oxfmt` via lint-staged on commit.
 
@@ -302,7 +307,10 @@ tenant and every item passes. Switching on an extra connection makes the connect
   README and Action, and commit them on `feat/ipx-9497-auth0-tenants`. They are the
   `design.same_repo_docs`, and they still carry the uncommitted `/speckit-plan` amendments (ADR-0040
   decisions 4, 5 and 9, failure modes 1, 9 and 13, sequence failure 1), which this turn commits. Also add
-  "Allow Offline Access: off" to ADR-0040 decision 7, to match data-model.md (IPX-9497)
+  "Allow Offline Access: off" to ADR-0040 decision 7, to match data-model.md. In the same `ipx-fix` run,
+  add a **patch changeset** for `@ipx/ipx-ops` in `repos/ipx/.changeset/` (CI runs
+  `pnpm changeset status --since=<base>` and `ignore` is empty), describing it as docs plus the Auth0
+  Action source with no runtime change (IPX-9497)
 - [ ] T028 [P] Check that `repos/ipx-cd/docs/services/ipx-ops.md` (PR ipxos-ai/ipx-cd#1639) still
   matches the final design. Any fix is a new commit on `docs/ipx-9497-auth0-tenants`. **Do not merge
   #1639** (IPX-9497)

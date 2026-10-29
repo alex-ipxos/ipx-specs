@@ -54,8 +54,9 @@ were corrected (R1, R3).
   type-checks only `src/`. Auth0 Actions are CommonJS (`exports.onExecutePostLogin`) on Node 22.
 - **Decision**: Keep the source at `apps/ipx-ops/auth0/actions/restrict-to-ipxos-domain.cjs`. That
   is the exact text pasted into the Auth0 editor; the `.cjs` extension lets Node load it as CommonJS
-  inside a module package. Its test sits beside it, `restrict-to-ipxos-domain.test.ts`, with
-  `// @vitest-environment node`, loading the source through `createRequire`.
+  inside a module package. Its test sits beside it, `restrict-to-ipxos-domain.test.ts`, under the default jsdom environment
+  (a node-environment pragma would crash in the shared `src/test/setup.ts`), loading the source
+  through `createRequire`. A patch changeset is required because CI runs `changeset status`.
 - **Rationale**: The file is byte-identical to what each tenant runs, so the checklist can diff it.
   It is covered by the existing `pnpm --filter ipx-ops test` gate with no new tooling.
 - **Alternatives considered**:
