@@ -41,11 +41,11 @@ the operator guide live in this spec folder. The `ipx-ops` README copy, the Vite
 - [x] T003 [US1–US4] Operator guide [runbook.md](runbook.md): setup order, Action paste and diff,
   secrets, link to the [quickstart.md](quickstart.md) checklist, runbooks R1 to R3 (FR-011, interim
   home)
-- [ ] T004 Post a `[Speckit] scope change` comment on IPX-9497: manual Auth0 setup, ipx-ops and
+- [x] T004 Post a `[Speckit] scope change` comment on IPX-9497: manual Auth0 setup, ipx-ops and
   ipx-cd untouched, interim homes for FR-011 and FR-015, and the deferred list below. Update the
   ticket description to match (Principle VII) (IPX-9497)
-- [ ] T005 Create the follow-up Linear ticket for the Deferred items, linked to IPX-9497, IPX-9500
-  and IPX-9504. Record its id here (IPX-9497)
+- [x] T005 Create the follow-up Linear ticket for the Deferred items, linked to IPX-9497, IPX-9500
+  and IPX-9504: [IPX-9772](https://linear.app/ipxos-ai/issue/IPX-9772) (IPX-9497)
 
 **Checkpoint**: Everything you need to configure a tenant by hand is in this folder and tested.
 
@@ -93,7 +93,7 @@ the operator guide live in this spec folder. The `ipx-ops` README copy, the Vite
 
 ---
 
-## Deferred (follow-up ticket, T005)
+## Deferred ([IPX-9772](https://linear.app/ipxos-ai/issue/IPX-9772))
 
 These were tasks in the 2026-10-26 plan. They need `ipxos-ai/ipx` or `ipxos-ai/ipx-cd` and go
 through the governed workflow (`ipx-fix`, Principle III) when picked up.
@@ -121,6 +121,6 @@ through the governed workflow (`ipx-fix`, Principle III) when picked up.
 
 ## Notes
 
-- 16 tasks: 3 done, 2 Linear, 11 manual. No code is deployed and no PR is opened in this scope.
+- 16 tasks: 5 done (3 spec-side, 2 Linear), 11 manual. No code is deployed and no PR is opened in this scope.
 - If you change the Action, change `auth0/restrict-to-ipxos-domain.cjs` first, run the tests, then
   re-paste into each tenant and re-run the diff.

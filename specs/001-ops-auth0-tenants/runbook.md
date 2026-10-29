@@ -2,7 +2,7 @@
 
 The operator guide FR-011 requires: setup steps, the verification checklist, and recovery runbooks.
 It lives in this spec folder while the tenants are configured by hand. A copy in
-`apps/ipx-ops/README.md` is deferred to a follow-up ticket (see [tasks.md](tasks.md), Deferred).
+`apps/ipx-ops/README.md` is deferred to [IPX-9772](https://linear.app/ipxos-ai/issue/IPX-9772).
 
 Values are in [data-model.md](data-model.md). The checklist is [quickstart.md](quickstart.md).
 The Action source is [auth0/restrict-to-ipxos-domain.cjs](auth0/restrict-to-ipxos-domain.cjs).
