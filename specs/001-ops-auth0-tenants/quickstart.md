@@ -1,8 +1,8 @@
 # Quickstart: validate an Ops Portal identity provider tenant
 
 Run this against **each** tenant (`ipxos-dev`, `ipxos-stg`) after setup, and again after any
-dashboard change. It is the verification checklist that FR-011 requires in `apps/ipx-ops/README.md`.
-The README copy is the one maintained; this file is how the feature is proven during delivery.
+dashboard change. It is the verification checklist that FR-011 requires. Until the `apps/ipx-ops/README.md` copy
+exists (follow-up ticket), this file is the maintained one. Setup steps are in [runbook.md](runbook.md).
 Setup values are in [data-model.md](data-model.md).
 
 ## Prerequisites
@@ -10,7 +10,7 @@ Setup values are in [data-model.md](data-model.md).
 - Admin access to the tenant in the Auth0 dashboard.
 - One ipxos.ai Google account, and one personal Google account (gmail.com).
 - Read access to Infisical `/web-ipx-ops` and `/svc-identity` for the environment.
-- The `ipx` checkout, for the Action source.
+- This `ipx-specs` checkout, for the Action source (`specs/001-ops-auth0-tenants/auth0/`).
 - `curl` and `jq`.
 
 ## 1. Tenant (failure modes 12 and 3)
@@ -39,9 +39,9 @@ curl -s "https://$T.au.auth0.com/.well-known/openid-configuration" | jq -r .issu
 
 - [ ] Actions > Flows > Login runs exactly one Action, **Restrict to ipxos.ai**, and it is deployed.
 - [ ] Copy the deployed code into `/tmp/deployed.cjs`, then run
-  `diff /tmp/deployed.cjs apps/ipx-ops/auth0/actions/restrict-to-ipxos-domain.cjs`. It prints
+  `diff /tmp/deployed.cjs specs/001-ops-auth0-tenants/auth0/restrict-to-ipxos-domain.cjs`. It prints
   nothing.
-- [ ] In `ipx`, run `pnpm --filter ipx-ops exec vitest run auth0/actions`. All cases in
+- [ ] From the `ipx-specs` root, run `node --test 'specs/001-ops-auth0-tenants/auth0/*.test.cjs'`. All cases in
   [the Action contract](contracts/restrict-to-ipxos-domain-action.md) pass.
 
 ## 4. API

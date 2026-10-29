@@ -57,7 +57,7 @@ is enabled for no application. `google-oauth2` (social) is disabled or enabled f
 |---|---|
 | trigger | Login / Post Login |
 | runtime | Node 22 |
-| source of truth | `apps/ipx-ops/auth0/actions/restrict-to-ipxos-domain.cjs` in `ipxos-ai/ipx` |
+| source of truth | `specs/001-ops-auth0-tenants/auth0/restrict-to-ipxos-domain.cjs` in `ipx-specs` (interim, 2026-10-29; moves to `apps/ipx-ops/auth0/actions/` in the follow-up) |
 | behaviour | [contracts/restrict-to-ipxos-domain-action.md](contracts/restrict-to-ipxos-domain-action.md) |
 | bound to the Login flow | yes, and it is the only Action in that flow |
 | secrets or dependencies | none |

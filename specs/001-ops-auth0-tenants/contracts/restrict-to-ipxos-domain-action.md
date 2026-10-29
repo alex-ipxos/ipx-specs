@@ -1,7 +1,8 @@
 # Contract: "Restrict to ipxos.ai" post-login Action
 
-**Source of truth**: `apps/ipx-ops/auth0/actions/restrict-to-ipxos-domain.cjs` (`ipxos-ai/ipx`),
-written through `ipx-fix`. The text deployed in each tenant matches this file byte for byte.
+**Source of truth**: `specs/001-ops-auth0-tenants/auth0/restrict-to-ipxos-domain.cjs` (`ipx-specs`),
+interim from 2026-10-29. It moves to `apps/ipx-ops/auth0/actions/` (`ipxos-ai/ipx`), through `ipx-fix`,
+in the follow-up ticket. The text deployed in each tenant matches this file byte for byte.
 **Decision**: ipx-ops ADR-0040 decision 5. **Requirements**: FR-005, FR-014, FR-015, TRU.IAM.R63.
 
 ## Interface
@@ -43,7 +44,8 @@ Nothing else is read. In particular, not email, connection name, metadata or app
 
 ## Test obligations (FR-015)
 
-The colocated `restrict-to-ipxos-domain.test.ts` runs under the `ipx-ops` Vitest gate and asserts,
+Interim: `auth0/restrict-to-ipxos-domain.test.cjs` runs with `node --test` and asserts the cases below.
+After the move, a colocated `restrict-to-ipxos-domain.test.ts` runs under the `ipx-ops` Vitest gate and asserts,
 with a fake `event` and a spy `api`:
 
 1. A1: `idp_tenant_domain: 'ipxos.ai'` → `api.access.deny` not called, and no other `api` member called.

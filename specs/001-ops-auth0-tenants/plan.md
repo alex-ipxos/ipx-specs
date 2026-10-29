@@ -28,6 +28,22 @@ The repository deliverables, all through `ipx-fix`, are:
 The tenants themselves are an operator action outside the codebase. They are proven by the
 [quickstart](quickstart.md) checklist.
 
+## Scope change (2026-10-29)
+
+The developer configures the Auth0 tenants **by hand** and does not touch `ipxos-ai/ipx` or
+`ipxos-ai/ipx-cd` for now. This overrides the repository deliverables above and the Workspace,
+Delivery constraints and Delivery order sections below wherever they differ:
+
+- The Action source and its tests live in `specs/001-ops-auth0-tenants/auth0/` (Node's built-in
+  test runner, no dependencies). The tenants' deployed copies are diffed against that file.
+- The operator guide is [runbook.md](runbook.md) plus [quickstart.md](quickstart.md).
+- Deferred to a follow-up ticket: the Action and Vitest test in `apps/ipx-ops`, the README section,
+  the ADR-0040 and design-doc commits, ipx-cd#1639, and the `ipx-*` governance turns (the
+  implementation plan awaiting tech-lead approval is parked with them).
+- The live configuration is no longer held behind a merge: the developer runs it by hand, in the
+  order in [tasks.md](tasks.md).
+- `repos/ipx` and `repos/ipx-cd` stay as they are, including the uncommitted ADR-0040 drafts.
+
 ## Technical Context
 
 **Language/Version**: JavaScript (CommonJS) for the Auth0 Action on the Auth0 Actions Node 22
@@ -76,7 +92,7 @@ All earlier unknowns are resolved in [research.md](research.md), R1 to R5.
 |---|---|---|
 | I. Canon is the source | PASS: TRU.IAM.R63 cited; the IPX-9497 scope mirrors it | PASS: amendments recorded on IPX-9497 and in ADR-0040; no requirement invented |
 | II. ipx-discuss first | PASS: `/ipx-discuss IPX-9497` completed 2026-10-26 | PASS: design amendment R1 recorded as a discuss-decision change (Linear comment 2026-10-26) |
-| III. Code only through ipx-fix | PASS: no code in scope at discuss time | PASS: the Action `.cjs`, its test and the README are written only through `ipx-fix`. The tenants are an operator action, not code |
+| III. Code only through ipx-fix | PASS: no code in scope at discuss time | PASS: the Action `.cjs`, its test and the README are written only through `ipx-fix`. The tenants are an operator action, not code. 2026-10-29: no service repository is changed in this round; the interim Action copy lives in `ipx-specs`, not a service repo, and moves to `apps/ipx-ops` through `ipx-fix` in the follow-up |
 | IV. In-service token verification | N/A for this feature (no service). Supplies issuer and audience for IPX-9498 | PASS: [token contract](contracts/access-token-for-svc-identity.md) fixes `alg`, `iss`, `aud`; svc-identity verifies them itself |
 | V. Subject from token | N/A (no service) | PASS: the token contract says identity comes from `sub` and never from an email claim |
 | VI. No roles yet | PASS: no roles, claims or RBAC | PASS: the only Action is deny-only; its contract forbids every claim or metadata call |

@@ -174,7 +174,10 @@ relevant item fail.
   check is what enforces FR-005.
 - **FR-015**: The refusal check's source MUST be kept in the codebase with automated tests covering
   admit, refuse-other-domain and refuse-no-domain, changed only through the governed workflow. The
-  copy running in each environment MUST match it exactly.
+  copy running in each environment MUST match it exactly. *(Interim, 2026-10-29: while the tenants
+  are configured by hand and `ipx-ops` is not touched, the source and its tests live in
+  `specs/001-ops-auth0-tenants/auth0/` in `ipx-specs`. Moving them into `apps/ipx-ops` under the
+  governed workflow is deferred to a follow-up ticket; FR-015 is fully met only then.)*
 - **FR-008**: The portal's client credentials and the issuer MUST be stored in the secrets manager
   under the portal's existing location for each environment.
 - **FR-009**: The identity service's issuer and intended-recipient values MUST be stored in the
@@ -184,7 +187,9 @@ relevant item fail.
   publishes for that environment.
 - **FR-011**: The Ops Portal's setup documentation MUST include the setup steps for an environment, a
   verification checklist covering FR-002 to FR-010 and FR-014 to FR-015, and recovery procedures for: sign-in failing in
-  an environment, an exposed client credential, and an operator leaving.
+  an environment, an exposed client credential, and an operator leaving. *(Interim, 2026-10-29: this
+  guide is `specs/001-ops-auth0-tenants/runbook.md` plus `quickstart.md`. The copy in the Ops
+  Portal's README is deferred to a follow-up ticket.)*
 - **FR-012**: The identity provider's default session lifetimes MUST be kept, and the resulting leaver
   exposure MUST be recorded as an accepted risk in the design record.
 - **FR-013**: The current sign-in provider (Authentik) MUST remain unchanged and in use by the portal.
@@ -219,7 +224,8 @@ relevant item fail.
   portal and identity service, in two environments).
 - **SC-006**: A new administrator can stand up a further environment from the written steps alone, and
   it passes the checklist without help. This is verified when the production tenant is built from
-  the README in IPX-9504 by someone who did not write it. That is the next environment to be created,
+  the written steps (the README, or `runbook.md` until it moves there) in IPX-9504 by someone who did
+  not write them. That is the next environment to be created,
   and the criterion is carried on that ticket.
 
 ## Assumptions
@@ -239,5 +245,7 @@ relevant item fail.
   has no address yet.
 - Exact settings (callback paths, the identity service's registered name, signing method, secrets
   locations) are recorded in ipx-ops ADR-0040 and the plan, not in this specification.
-- Constitution Principle III applies: the documentation changes are made through `ipx-fix`. The
-  identity provider configuration is an operator action outside the codebase.
+- Constitution Principle III applies to service repositories: any later change in `apps/ipx-ops` is
+  made through `ipx-fix`. The identity provider configuration is an operator action outside the
+  codebase. Scope change 2026-10-29: the tenants are set up by hand from this spec folder, and no
+  service repository is changed in this round.

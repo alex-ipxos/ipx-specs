@@ -65,6 +65,10 @@ were corrected (R1, R3).
   - Keeping the code only in the README. Rejected: it can't be tested, and Principle III is not met.
 - **Known gap**: the `.cjs` file is outside `tsc`'s include, so it is not type-checked. The test is
   the guard.
+- **Amendment (2026-10-29)**: the developer configures the tenants by hand and `apps/ipx-ops` is not
+  touched for now. Interim home: `specs/001-ops-auth0-tenants/auth0/` in `ipx-specs`, tested with
+  Node.s built-in runner (`node --test`), no dependencies. The decision above applies when the
+  follow-up ticket moves the file into `apps/ipx-ops`.
 
 ## R5. Callback path, issuer format, region domain
 
