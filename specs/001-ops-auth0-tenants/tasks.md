@@ -51,7 +51,31 @@ the operator guide live in this spec folder. The `ipx-ops` README copy, the Vite
 
 ---
 
-## Phase 2: Tenant `ipxos-dev` (MANUAL, follow runbook.md)
+## Sandbox run (2026-10-29): `dev-ipxos-play`
+
+Tenant creation needs an Auth0 Team Owner, so `ipxos-dev` and `ipxos-stg` are **on hold** until an
+owner creates them in AU. For now the setup is rehearsed on the tenant you were given:
+
+- Tenant `dev-ipxos-play`, domain `dev-ipxos-play.eu.auth0.com`, issuer
+  `https://dev-ipxos-play.eu.auth0.com/`.
+- **Region EU, not AU: it does not meet FR-002**, so it does not count toward T006 to T016. It is a
+  sandbox for rehearsing the runbook, not the dev environment.
+- Follow runbook steps 1 to 7 with `<tenant>` = `dev-ipxos-play` and `.eu.auth0.com` in place of
+  `.au.auth0.com`. Use the **localhost callback only**
+  (`https://ipx-ops.localhost/api/auth/callback/auth0`); do not register `ops.ipxos.dev`.
+- No Infisical entries (step 8): nothing consumes this tenant.
+- **Sign-in route differs from the spec (sandbox only)**: the ipxos.ai Google Cloud organisation
+  is not set up yet, so there is no Google OAuth client. The sandbox uses the `google-oauth2` social
+  connection on Auth0 developer keys instead of the Workspace connection (deviates from FR-004), and
+  `auth0/sandbox-restrict-to-ipxos-email.cjs` (verified email ending `@ipxos.ai`) instead of the
+  real Action (deviates from FR-014). Step 6's diff is against the sandbox file. Neither carries
+  over to `ipxos-dev` / `ipxos-stg`, which need runbook "Prerequisite: Google Cloud".
+- [x] S1 Runbook steps 1 to 4 on `dev-ipxos-play` (Default App deleted; `google-oauth2` on dev keys; `svc-identity` API; `ipx-ops` app, localhost callback only)
+- [x] S2 Runbook steps 5 and 6: sandbox Action deployed and bound as the only post-login Action
+- [x] S3 Runbook step 7, then the probes (2026-10-29): ipxos.ai account gets a `code`; personal Gmail gets `error=access_denied`; unregistered `redirect_uri` rejected by Auth0; `dbconnections/signup` refused (HTTP 400 `public signup is disabled`)
+- [ ] S4 Optional: quickstart step 6 token check (needs the client secret to exchange the code; do it locally, never paste the token or secret anywhere). Record the session lifetimes from Settings > Advanced
+
+## Phase 2: Tenant `ipxos-dev` (MANUAL, follow runbook.md; ON HOLD: needs a Team Owner)
 
 - [ ] T006 [US1] MANUAL. Runbook steps 1 to 4: tenant in AU, Enable Application Connections off,
   Google OAuth client and Workspace connection (enabled for no app), database sign-ups disabled,
@@ -71,7 +95,7 @@ the operator guide live in this spec folder. The `ipx-ops` README copy, the Vite
 - [ ] T012 [US3] MANUAL. Quickstart step 6 on the access token: `alg` RS256, `aud` ∋ `svc-identity`,
   `iss` = discovery issuer, no `permissions`, `roles`, `groups` or custom claims (SC-004)
 
-## Phase 3: Tenant `ipxos-stg` (MANUAL, follow runbook.md)
+## Phase 3: Tenant `ipxos-stg` (MANUAL, follow runbook.md; ON HOLD: needs a Team Owner)
 
 - [ ] T013 [US1] MANUAL. Repeat T006 to T010 and T012 for `ipxos-stg` (staging callback only; no
   localhost entry, so skip T011)

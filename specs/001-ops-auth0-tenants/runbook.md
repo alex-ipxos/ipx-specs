@@ -9,6 +9,23 @@ The Action source is [auth0/restrict-to-ipxos-domain.cjs](auth0/restrict-to-ipxo
 
 Auth0 authenticates only and grants no roles (TRU.IAM.R63). Production is IPX-9504's.
 
+## Prerequisite: Google Cloud (once, by a Google Workspace super-admin)
+
+The Workspace connection needs a Google OAuth client in a project that belongs to the ipxos.ai
+organisation; only then can its consent screen be **Internal**.
+
+1. **Activate the organisation**: a super-admin signs in to console.cloud.google.com with their
+   ipxos.ai account and accepts the terms. The `ipxos.ai` organisation then appears in the project
+   picker (until then it shows "No organisation").
+2. **Create the project** `ipx-auth0` under the ipxos.ai organisation.
+3. **Grant access** to whoever sets up the tenants: on that project, IAM role **Editor** (or the
+   narrower OAuth Config Editor plus Service Usage Admin).
+4. In the project: enable the **Admin SDK API**, and set the consent screen to **Internal** with
+   authorised domain `auth0.com`.
+
+Then one OAuth client per tenant (runbook step 2). None of this changes anything for users or in
+the Workspace admin console.
+
 ## Setup order (per tenant: `ipxos-dev` first, then `ipxos-stg`)
 
 Nobody can sign in until step 7. Do not reorder: the Workspace connection is enabled for ipx-ops
