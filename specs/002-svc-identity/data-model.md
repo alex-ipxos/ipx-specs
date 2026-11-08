@@ -4,6 +4,11 @@ The full Prisma schema, field notes and constraints are in the svc-identity ERD
 (`docs/erd/ipx-9498-erd.md`, landing with the first code PR). This file states what the spec's
 requirements need from it.
 
+**Naming** (constitution, Persistence): Prisma models are PascalCase and fields camelCase, mapped
+with `@@map`/`@map` to snake_case tables and columns (`platformUserId` → `platform_user_id`,
+`createdAt` → `created_at`). Only `IdentityRepository` reads or writes these tables. Every schema
+change is a new migration, applied by `npm run db:migrate`, never on boot.
+
 ## PlatformUser (`platform_user`)
 
 | Field | Type | Rule | Requirement |
@@ -36,11 +41,15 @@ ACTIVE --manual change (this slice)--> DISABLED
 DISABLED --any request--> refused 403, unchanged
 ```
 
-There is no transition back to `ACTIVE` through the service in this slice, and no deletion.
+There is no transition back to `ACTIVE` through the service in this slice, and no deletion. The
+service never writes `status`, so this slice needs no state-machine class (research R10). The
+`ACTIVE → DISABLED` change is an operator's direct database update, tested by setting the row in
+the integration test.
 
 ## Validation at the boundary (zod)
 
-- Configuration: issuer URL (ends with `/`), audience, database URL, port (research R6).
+- Configuration: `ENVIRONMENT`, issuer URL (ends with `/`; `https`, or localhost only when
+  `ENVIRONMENT=local`), audience, database URL, port, log level (research R6).
 - `Authorization` header: `Bearer <compact JWS>`. Anything else is `401 invalid_token`.
 - `/userinfo` response: `email` (non-empty string) and `name` (non-empty string, falling back to
   the email when the provider omits it). Missing `email` is `502 profile_invalid`.

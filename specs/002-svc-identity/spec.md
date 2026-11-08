@@ -272,9 +272,11 @@ and dependency is raised.
 - **Personal data**: name and email are personal data, and the provider's identifier for a person is
   treated as personal data. Records are kept until the leaver and erasure work defines removal.
 - **Scale**: fewer than 100 operators in this slice (the ipxos.ai Workspace).
-- **Environments**: tests run against keys the tests generate themselves; local runs use the sandbox
-  identity provider tenant `dev-ipxos-play`. Dev and staging use the IPX-9497 tenants once they exist
-  (on hold for an Auth0 Team Owner).
+- **Environments**: tests and local runs use keys generated on the developer's machine, served by a
+  local stand-in for the identity provider, so the service runs with no live tenant (constitution
+  Principle VIII). The proof is still checked in full; nothing is switched off. The sandbox tenant
+  `dev-ipxos-play` is an optional extra check. Dev and staging use the IPX-9497 tenants once they
+  exist (on hold for an Auth0 Team Owner).
 - **Repository**: `ipxos-ai/svc-identity` does not exist yet (requested in
   `ipxos-ai/github-configuration#56`). Design documents wait in a local placeholder repository and land
   with the first code change. Implementation starts only once the repository exists.

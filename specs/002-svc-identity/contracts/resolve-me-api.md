@@ -21,8 +21,9 @@ traceparent: <W3C trace context> (optional)
 
 ## Responses
 
-All responses carry `X-Correlation-Id`. Errors are `{ "error": { "code": "<code>", "message": "<fixed text>" } }`,
-never echoing input.
+All responses carry `X-Correlation-Id`. Errors are
+`{ "code": "<code>", "message": "<fixed text>", "statusCode": <status> }` (the estate error body,
+constitution Principle IX; research R10), never echoing input.
 
 | Status | Body / code | When |
 |---|---|---|
