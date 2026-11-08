@@ -589,11 +589,11 @@ tests.
 - [X] T047 Run [quickstart.md](quickstart.md) steps 1 to 5 from a fresh clone of the branch (step 6,
   against `dev-ipxos-play`, is optional). Record pass counts, the coverage figure and the measured
   p95 latencies (SC-004) for the progress comment (IPX-9498)
-- [ ] T048 Run the remaining non-deploying governance turns from `repos/svc-identity` via
+- [X] T048 Run the remaining non-deploying governance turns from `repos/svc-identity` via
   `/ipxos-skills:ipx-next`: `audit`, `verify-qa`, `pr`. `verify-qa` reads the `AC-N` JUnit evidence.
   `pr` pushes `feat/ipx-9498-svc-identity` and opens the PR, which moves Linear to In Review. Stop
   before `merge` (IPX-9498)
-- [ ] T049 Post the `[Speckit] implement` progress comment on IPX-9498: completed task IDs, commit
+- [X] T049 Post the `[Speckit] implement` progress comment on IPX-9498: completed task IDs, commit
   SHAs, the PR links (svc-identity, ipx-cd#1802, domain-docs), the T047 results, and "HELD: T050".
   If the endpoint or error codes changed beyond the 2026-11-05 error-body note, post a short note
   on IPX-9500 too (IPX-9498, IPX-9500)
