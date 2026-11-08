@@ -586,7 +586,7 @@ tests.
 
   Make it a new commit on `docs/ipx-9498-svc-identity-lld` (PR ipxos-ai/ipx-cd#1802). Write through
   the branch, never with `gh api` to `main` (IPX-9498)
-- [ ] T047 Run [quickstart.md](quickstart.md) steps 1 to 5 from a fresh clone of the branch (step 6,
+- [X] T047 Run [quickstart.md](quickstart.md) steps 1 to 5 from a fresh clone of the branch (step 6,
   against `dev-ipxos-play`, is optional). Record pass counts, the coverage figure and the measured
   p95 latencies (SC-004) for the progress comment (IPX-9498)
 - [ ] T048 Run the remaining non-deploying governance turns from `repos/svc-identity` via

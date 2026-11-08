@@ -85,7 +85,8 @@ IDENTITY_ISSUER= npm run dev
 # exits non-zero naming IDENTITY_ISSUER, not its value
 ENVIRONMENT=staging IDENTITY_ISSUER=http://localhost:9024/ npm run dev
 # exits: localhost issuer refused outside local
-npm run build && NODE_ENV=production ENVIRONMENT= npm start
+npm run build && NODE_ENV=production ENVIRONMENT= \
+  IDENTITY_ISSUER=https://example.eu.auth0.com/ DATABASE_URL=postgresql://u:p@localhost:5446/x npm start
 # exits: ENVIRONMENT must be set in a deployed build
 ```
 
