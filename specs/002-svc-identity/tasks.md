@@ -597,9 +597,12 @@ tests.
   SHAs, the PR links (svc-identity, ipx-cd#1802, domain-docs), the T047 results, and "HELD: T050".
   If the endpoint or error codes changed beyond the 2026-11-05 error-body note, post a short note
   on IPX-9500 too (IPX-9498, IPX-9500)
-- [ ] T050 HELD. After approval: merge the svc-identity PR via `ipx-merge`, then ipx-cd#1802 and the
+- [X] T050 HELD. After approval: merge the svc-identity PR via `ipx-merge`, then ipx-cd#1802 and the
   `domain-docs` contract PR. Merging deploys nothing (no deploy job, research R5); deployment is
   IPX-9499 (IPX-9498)
+  - Done 2026-11-09. svc-identity#1 (`a0a1d136`), ipx-cd#2055, domain-docs#420 and platform-docs#339
+    merged; ipx-cd#1802 was already merged. Bundle signed after merge, closeout PR svc-identity#2
+    merged, `assert-fully-closed.sh` reports FULLY CLOSED, Linear Done.
 
 ---
 
