@@ -1,0 +1,10 @@
+# Repo worktrees for active features (see each plan.md "Workspace"). Never commit them.
+/repos/
+
+# OS / editor
+.DS_Store
+Thumbs.db
+*.swp
+*.tmp
+.vscode/
+.idea/
