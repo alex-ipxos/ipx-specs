@@ -202,7 +202,9 @@ release, with no change to the other). The repository already runs many releases
 values file, so this is the house pattern rather than a new mechanism. Sharing the image tag is what
 makes "the same portal features" true by construction (FR-001, FR-022).
 
-**⚠️ Open question, for the developer or whoever holds IPX-9497**: does the parallel portal get its
+**✅ Settled 2026-11-19 (developer): its own Auth0 application.** The parallel portal gets `ipx-ops-auth0`, a Regular Web Application in `ipxos-dev` only, with its own client id, client secret and Infisical path `/web-ipx-ops-auth0`. Setup, verification and withdrawal are in [auth0-application-setup.md](./auth0-application-setup.md). One consequence for IPX-9497: the Workspace connection becomes enabled for two applications, not one (tasks.md T061). The original question follows for the record.
+
+**Original open question, for the developer or whoever holds IPX-9497**: does the parallel portal get its
 **own Auth0 application** (own client id and secret) or an **additional callback URL on the existing
 Ops Portal application**? The spec leaves this open by design ("a planning decision, either way
 covered by FR-003 and the IPX-9497 checklist"). It cannot be settled from this repository, because

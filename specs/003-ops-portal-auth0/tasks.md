@@ -54,8 +54,8 @@ all (the Auth0 tenants do not exist yet and svc-identity is deployed nowhere).
 
 - [ ] T001 Cut the code branch `feat/ipx-9500-ops-portal-auth0` in `ipxos-ai/ipx` via `/ipx-branch`, staging the three design docs `/ipx-discuss` left untracked: `apps/ipx-ops/docs/adr/0051-ops-portal-auth0-parallel-deployment-and-platform-user-binding.md`, `apps/ipx-ops/docs/sequences/ipx-9500-auth0-sign-in-and-platform-user-binding.md`, `apps/ipx-ops/docs/architecture/ipx-9500-system-architecture.md` (recorded in the governance bundle's `design.same_repo_docs[]`)
 - [ ] T002 [P] Add the new keys to `apps/ipx-ops/.env.example` with working local-profile values and one comment line each: `AUTH_PROVIDER` (`authentik|auth0`, **defaults to `authentik`** when unset), `AUTH_AUTH0_ISSUER` (absolute https URL, **byte-exact including the trailing slash**), `AUTH_AUTH0_ID`, `AUTH_AUTH0_SECRET`, `AUTH_AUTH0_AUDIENCE` (default `svc-identity`), `SVC_IDENTITY_API_URL` (absolute URL, **no** trailing slash) — per `specs/003-ops-portal-auth0/contracts/portal-configuration.md`
-- [ ] T003 [P] Record the outcome of gate **G-VIII-a** in `specs/003-ops-portal-auth0/plan.md` (constitution amended, or a ticket filed for removing `AUTH_BYPASS`) — a one-line amendment to the Constitution Check row, not a justification in Complexity Tracking, because Principle VIII cannot be waived
-- [ ] T004 [P] Settle research.md **R8** and record it in `specs/003-ops-portal-auth0/research.md`: the parallel portal gets **(a)** its own Auth0 application (own client id and secret — **recommended**, FR-003 says the two portals share no provider registration) or **(b)** an extra callback URL on the existing Ops Portal application. Needs whoever holds **IPX-9497**; the only downstream effect is how many secrets T030 provisions
+- [x] T003 [P] Record the outcome of gate **G-VIII-a** in `specs/003-ops-portal-auth0/plan.md`. **Done 2026-11-19**: the removal of `AUTH_BYPASS` is filed as its own ticket, **IPX-10983** (related to IPX-9880). It stays as it is in this feature (FR-021, AC-9). Recorded as a one-line amendment to the Constitution Check row
+- [x] T004 [P] Settle research.md **R8** and record it in `specs/003-ops-portal-auth0/research.md`. **Done 2026-11-19**: **(a) its own Auth0 application**, `ipx-ops-auth0`, with its own client id and secret, in `ipxos-dev` only. The setup is written up in [auth0-application-setup.md](./auth0-application-setup.md) and carried out by T045 and T058–T061
 - [ ] T005 [P] Stand up the local OIDC stub for development (discovery, `/authorize`, `/oauth/token`, `/jwks.json`, `/userinfo`, locally generated RS256 keys) and document its start command in `specs/003-ops-portal-auth0/quickstart.md` — research.md R5. Shared with svc-identity's own local profile, so one key set signs the token both sides verify
 - [ ] T006 [P] Verify svc-identity runs locally from its own repo (`npm run db:up` → `db:migrate` → `dev`, its quickstart) against the T005 stub, and note the port it serves on in `specs/003-ops-portal-auth0/quickstart.md`
 
@@ -203,8 +203,12 @@ item passes, then withdraws the release and confirms the current portal is healt
 ### Delivery (not deployed until the developer approves — plan.md Delivery constraints)
 
 - [ ] T044 [US5] Add the second Helm release `web-ipx-ops-auth0` to `dev-ipxosai-services/values-dev.yaml` (`ipx-cd`): the **same** image repository and tag as `web-ipx-ops`, its own `virtualService.host`, its own `env:` block with `AUTH_PROVIDER=auth0` plus the four `AUTH_AUTH0_*` keys and `SVC_IDENTITY_API_URL`, its own Infisical secret reference, its own `AUTH_SECRET`, and **a distinct Auth.js session cookie name** — the two must share no session store, cookie name, callback address or provider registration (FR-003, data-model.md E5)
-- [ ] T045 [US5] Register the parallel portal's callback `https://<its host>/api/auth/callback/auth0` on the Auth0 application chosen in T004, and provision its secrets under their own Infisical `/web-ipx-ops` keys, separate from the current portal's (FR-019). Depends on the `ipxos-dev` tenant existing — **IPX-9497**, held until deployment approval
-- [ ] T046 [US5] Write the deployment-and-verification checklist and the withdrawal procedure at `specs/003-ops-portal-auth0/runbook.md`, covering FR-001–FR-019 and FR-024–FR-027, runnable by an administrator who did not perform the deployment, and including the screen sweep of T047 and the "delete this release only" withdrawal (FR-020, **AC-14**)
+- [ ] T045 [US5] Create the `ipx-ops-auth0` Regular Web Application in `ipxos-dev` per [auth0-application-setup.md](./auth0-application-setup.md) steps 1–3 and 5: the callback `https://<T044 host>/api/auth/callback/auth0` and nothing else, logout URL and web origin `https://<T044 host>`, Authorization Code as the only grant, RS256, OIDC Conformant, **no connection enabled yet**. Depends on the `ipxos-dev` tenant existing (**IPX-9497**) and on T044 fixing the host. **Held until deployment approval**
+- [ ] T058 [US5] Allow `ipx-ops-auth0` to request the `svc-identity` audience for users (setup guide step 4). This changes the API's application-access policy only if that policy requires per-application authorisation. **Held**
+- [ ] T059 [US5] Enable the ipxos.ai Google Workspace connection for `ipx-ops-auth0`, and nothing else (setup guide step 6). Then run the step 7 tenant checks: an `@ipxos.ai` login succeeds under `ipx-ops-auth0`; a Google account outside ipxos.ai is refused by `Restrict to ipxos.ai`; the access token has `iss` byte-exact, `aud` ∋ `svc-identity` and `alg` RS256. Record the outcome in the T046 checklist. **Held**
+- [ ] T060 [US5] Provision Infisical `/web-ipx-ops-auth0` (dev only, a path separate from `/web-ipx-ops`) with `AUTH_AUTH0_ID`, `AUTH_AUTH0_SECRET`, `AUTH_AUTH0_ISSUER` (byte-exact, trailing slash) and a **new** `AUTH_SECRET`, and point T044's secret reference at it (FR-019). Do not set non-secret keys there. `AUTH_PROVIDER`, `AUTH_AUTH0_AUDIENCE` and `SVC_IDENTITY_API_URL` live in the release's `env:` block. **Held**
+- [ ] T061 [P] Amend `specs/001-ops-auth0-tenants/data-model.md` (Connection, "enabled for") and the IPX-9497 checklist in `specs/001-ops-auth0-tenants/quickstart.md`: the Workspace connection is enabled for `ipx-ops` **and** `ipx-ops-auth0` (dev only), so a re-run of IPX-9497's checklist does not flag the second application as a failure (owner of **IPX-9497**)
+- [ ] T046 [US5] Write the deployment-and-verification checklist and the withdrawal procedure at `specs/003-ops-portal-auth0/runbook.md`, covering FR-001–FR-019 and FR-024–FR-027, runnable by an administrator who did not perform the deployment, and including the screen sweep of T047 and the "delete this release only" withdrawal, followed by the Auth0-side withdrawal in [auth0-application-setup.md](./auth0-application-setup.md) → Withdrawal (FR-020, **AC-14**)
 - [ ] T047 [US5] Run the FR-025 screen sweep on the parallel portal and record **every** screen in the T046 checklist as working, or refused with its reason. The cohort-gated and system-operator-gated screens (hierarchy read and write, the retention/compliance screen, the CRM cases/case/run/calendar screens) are expected to show their existing plain-words notice **pending IPX-9502** — recorded as refused, not as a defect, and never left unverified or showing empty data as if it were real (**AC-11**)
 - [ ] T048 [US5] Have someone who did not deploy it run the T046 checklist end to end, then withdraw the release and confirm the current portal is healthy with no change and no redeploy, within SC-007's 15 minutes (**AC-14**)
 
@@ -236,7 +240,7 @@ item passes, then withdraws the release and confirms the current portal is healt
 - **Phase 4 (US1)**: depends on Phase 2. T020 is shared groundwork for US4
 - **Phase 5 (US3)**: depends on Phase 4 (there must be an Auth0 sign-in before there is anything to resolve)
 - **Phase 6 (US4)**: depends on Phase 5 for the svc-identity refusals (T037, T039) and on T020 for the error page; the Auth0-side refusals (T033's first three rows, T035's provider rows) need only Phase 4
-- **Phase 7 (US5)**: the marker (T040–T043) depends only on Phase 2; the delivery tasks (T044–T048) depend on **every** story, on T004, and on **IPX-9497** and **IPX-9499**
+- **Phase 7 (US5)**: the marker (T040–T043) depends only on Phase 2; the delivery tasks (T044–T048, T058–T060) depend on **every** story, on T004, and on **IPX-9497** and **IPX-9499**. Within delivery the order is T044 (host) → T045 → T058 → T059 → T060 → T046 → T047 → T048. T061 can run at any time
 - **Phase 8 (Polish)**: T049 depends on Phases 2–6; T051 depends on the code PR merging; T052, T053, T055, T056 are independent and can run at any time
 
 ### Story dependencies
@@ -312,10 +316,10 @@ immediately; but it cannot be demonstrated without a reachable svc-identity.
 
 | Blocked on | What it blocks | Status |
 |---|---|---|
-| **IPX-9497** — Auth0 tenants created, parallel callback registered | T045, and the real-tenant half of T023/T047/T048 | held until deployment is approved |
+| **IPX-9497** — the `ipxos-dev` tenant, connection, API and Action exist | T045, T058–T060, and the real-tenant half of T023/T047/T048 | held until deployment is approved |
 | **IPX-9499** — svc-identity deployed in dev | T047, T048 in a deployed environment | In Progress |
-| **G-VIII-a** — the `AUTH_BYPASS` constitution gate | nothing technically; the plan's compliance claim | needs the developer |
-| **R8** — which Auth0 application | T045's secret count | needs IPX-9497's owner |
+| **G-VIII-a** — the `AUTH_BYPASS` constitution gate | nothing technically; the plan's compliance claim | **resolved 2026-11-19**: removal filed as IPX-10983 |
+| **R8** — which Auth0 application | T045's secret count | **resolved 2026-11-19**: its own application, `ipx-ops-auth0` |
 | **IPX-9502** — the real cohort/system-operator source | the gated screens in T047's sweep | Backlog, **needs re-scoping** (its premise changed) |
 
 ---
@@ -327,6 +331,6 @@ immediately; but it cannot be demonstrated without a reachable svc-identity.
 - `[P]` means different files and no dependency on an incomplete task — check the same-file
   contention list above before launching any pair
 - Every task belongs to **IPX-9500** unless its line names another ticket (T045 → IPX-9497,
-  T052 → IPX-9497, T055 → IPX-9501)
+  T052 → IPX-9497, T061 → IPX-9497, T055 → IPX-9501)
 - Nothing is merged or deployed until the developer explicitly approves it, including the parallel
   deployment itself

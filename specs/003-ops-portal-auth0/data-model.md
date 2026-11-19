@@ -147,8 +147,8 @@ Not application data — configuration, in `ipx-cd/dev-ipxosai-services/values-d
 | `AUTH_PROVIDER` | `authentik` (set explicitly; also the default) | `auth0` |
 | Session cookie | as today | **a distinct name** (FR-003) |
 | Auth callback | `/api/auth/callback/authentik` | `/api/auth/callback/auth0` |
-| Secrets | `web-ipx-ops-secrets` | its own secret reference, own keys (FR-019) |
-| Provider registration | the Authentik Ops Portal client | its own Auth0 application — **recommended, open question in research.md R8** |
+| Secrets | `web-ipx-ops-secrets` | its own secret reference, Infisical `/web-ipx-ops-auth0` (FR-019) |
+| Provider registration | the Authentik Ops Portal client | its own Auth0 application, `ipx-ops-auth0` (research.md R8, settled; [setup](./auth0-application-setup.md)) |
 | Backing services | the dev factories | **the same ones, the same data** (FR-022) |
 | Withdrawal | — | delete this release only; nothing changes on the other (FR-004, AC-14) |
 
