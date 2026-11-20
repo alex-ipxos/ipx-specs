@@ -206,6 +206,11 @@ were returned to `main` after the discuss turn.
   AC-2 and AC-10 are demonstrated against a locally run svc-identity, and FR-010 holds in an
   environment only once svc-identity answers there.
 - **Dev only** (FR-005). Staging and production are IPX-9504.
+- **A person confirms the local setup before any deployment step.** There are three [HUMAN]
+  sign-offs, each recorded as a comment on IPX-9500 and never run or ticked by an agent: T066 (local
+  run against the stub, before any live Auth0, Infisical, image or ipx-cd change), T065 (local run
+  against the real `ipxos-dev` tenant, naming the SHA that may be built) and T067 (approval to merge
+  the ipx-cd PR, which is the deployment). The same gates apply to every refresh.
 - **The code stays off `main`** (FR-028, research.md R11). The `ipx` PR stays a draft and is not
   merged. A push to `main` would run `publish-ipx-ops.yml`, whose `dispatch-dev-image` job bumps
   `web-ipx-ops` and restarts the current portal. The parallel portal's image is built by dispatching
