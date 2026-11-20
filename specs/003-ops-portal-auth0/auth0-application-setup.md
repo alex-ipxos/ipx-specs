@@ -32,9 +32,9 @@ domain restriction without extra work. Step 7 proves it.
 |---|---|
 | Name | `ipx-ops-auth0` |
 | Type | Regular Web Application |
-| Allowed Callback URLs | `https://<host>/api/auth/callback/auth0`, and nothing else |
-| Allowed Logout URLs | `https://<host>` |
-| Allowed Web Origins | `https://<host>` |
+| Allowed Callback URLs | `https://<host>/api/auth/callback/auth0`, `https://ipx-ops.localhost/api/auth/callback/auth0`, and nothing else |
+| Allowed Logout URLs | `https://<host>`, `https://ipx-ops.localhost` |
+| Allowed Web Origins | `https://<host>`, `https://ipx-ops.localhost` |
 | Application Login URI | blank |
 | Grant types (Advanced > Grant Types) | **Authorization Code** only. Untick Implicit, Refresh Token and Client Credentials |
 | JWT signature algorithm (Advanced > OAuth) | RS256 |
@@ -43,9 +43,11 @@ domain restriction without extra work. Step 7 proves it.
 | Enabled connections | exactly one: the ipxos.ai Google Workspace connection (enabled last, in step 6) |
 | API access | allowed to request the `svc-identity` audience for users (step 4) |
 
-There is **no** `ipx-ops.localhost` callback. Local development signs in against the local OIDC
-stub (research.md R5). If someone needs to test locally against the live tenant, the `ipx-ops`
-application from IPX-9497 already has that callback.
+The `ipx-ops.localhost` callback exists so the **same application** that gets deployed is proven
+locally against the real tenant before anything is deployed (T065). Day-to-day local development
+still uses the OIDC stub (research.md R5). This does not break FR-003: the current portal signs in
+through Authentik, so no callback is shared between the two portals. The callback can be removed
+once the parallel portal is withdrawn or switched over.
 
 ## Steps (`ipxos-dev`)
 
@@ -65,7 +67,7 @@ application from IPX-9497 already has that callback.
    is wrong. Stop and fix that first (IPX-9497 research R2).
 6. **Open sign-in.** Connections tab: enable the ipxos.ai Google Workspace connection and nothing
    else. From this moment anyone on ipxos.ai can sign in to the parallel portal.
-7. **Verify in the tenant.** Then delete the test user or users created here from User Management:
+7. **Verify in the tenant.** Running T065 locally is the easiest way to do this. Then delete the test user or users created here from User Management:
    - An `@ipxos.ai` account completes the hosted login. Under Monitoring > Logs, the login shows
      application `ipx-ops-auth0`, connection `google-apps`.
    - A Google account outside ipxos.ai is refused by `Restrict to ipxos.ai`. The log shows the

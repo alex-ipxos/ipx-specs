@@ -118,10 +118,19 @@ authorisation code, no client secret, no email, no `name` (**AC-12**, SC-009).
 
 ## Scenario 4 — a real operator on the real tenant (**AC-1, AC-2, AC-10**)
 
-Needs the `ipxos-dev` tenant to exist and the local callback
-`https://ipx-ops.localhost/api/auth/callback/auth0` to be registered on its application
-(IPX-9497's held task T032). Point `.env.local` at the tenant instead of the stub, keep
-svc-identity local.
+**The pre-deployment gate (tasks.md T065).** Nothing is deployed until this passes.
+
+Needs the `ipxos-dev` tenant (IPX-9497) and the parallel portal's own application,
+`ipx-ops-auth0`, set up per [auth0-application-setup.md](./auth0-application-setup.md), with its
+`https://ipx-ops.localhost/api/auth/callback/auth0` callback. Make these changes:
+- **The portal's `.env.local`:** point it at the tenant instead of the stub. Use
+  `AUTH_PROVIDER=auth0`, `AUTH_AUTH0_ISSUER=https://ipxos-dev.au.auth0.com/` (byte-exact), and the
+  `AUTH_AUTH0_ID` and `AUTH_AUTH0_SECRET` of `ipx-ops-auth0` copied from Infisical
+  `/web-ipx-ops-auth0`. Never commit them.
+- **svc-identity:** keep it local, but point its issuer and JWKS at the same tenant, so it verifies a
+  **real** Auth0 access token.
+
+Run the portal from the **feature branch at the exact commit that T063 will build**.
 
 1. An `ipxos.ai` operator signs in and lands in the portal — no account creation, no password
    (**AC-1**, and SC-001's under-30-seconds on a first-ever sign-in).
@@ -129,6 +138,11 @@ svc-identity local.
    UUID, not the Auth0 `sub` (**AC-2**).
 3. A personal Google account at the same URL is refused and sees the refusal page, not an error
    page (**AC-10**).
+4. The access token the portal received has `aud` containing `svc-identity`, and svc-identity
+   accepted it. Its log shows a `200` or `201` for `POST /v1/users/me`, not a `401`. This proves
+   T058.
+5. Record the commit SHA, the date, who ran it and the result on IPX-9500. T063 builds **that**
+   SHA.
 
 ---
 
