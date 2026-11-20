@@ -38,9 +38,14 @@ Auth.js JWT cookie. Lifetime: 8 hours (`session.maxAge`), per deployment.
 
 **Validation rules**
 
-1. A **real** (non-bypass) session with no `user.platformUserId` is treated as unauthenticated:
-   `getAuthenticatedOpsSessionData` returns `null`, the entry middleware refuses, and no portal
-   screen renders (FR-010, FR-013).
+1. **On the `auth0` arm only** (resolved `AUTH_PROVIDER=auth0`), a **real** (non-bypass) session
+   with no `user.platformUserId` is treated as unauthenticated: `getAuthenticatedOpsSessionData`
+   returns `null`, the entry middleware refuses, and no portal screen renders (FR-010, FR-013). **On
+   the `authentik` arm the rule does not apply.** Authentik sessions never carry
+   `platformUserId`, and requiring it there would refuse every sign-in on the current portal
+   (FR-002, AC-8). That includes the Finance registry's real-session read (ADR-0050). This was
+   corrected on 2026-11-20 during the `/ipx-discuss` re-run; as first written, the rule had no
+   provider scope.
 2. The **dev-bypass** session (`devBypassSession`, `AUTH_BYPASS=1` and `ENVIRONMENT ∈ {local,
    development, staging, test}`) deliberately carries **no** `platformUserId` and is exempt from
    rule 1 — there is no platform user behind `dev-operator` (ADR-0014, ADR-0051 decision 4, FR-021).
