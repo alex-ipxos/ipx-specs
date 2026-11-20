@@ -319,7 +319,7 @@ would sign the operator in through Auth0 and then:
 The dev-officer override and `dev_persona` therefore are **not** fenced away from an Auth0 session.
 They are fenced only by `AUTH_BYPASS`.
 
-**Decision needed (T068)**: the parallel release sets `AUTH_BYPASS: "0"`, or leaves it unset, so the
+**Decision (T068, developer, 2026-11-19): bypass off on the parallel release.** the parallel release sets `AUTH_BYPASS: "0"`, or leaves it unset, so the
 Auth0 sign-in is what the portal uses. The cost is that the officer switch (three-way capsule approval)
 and the demo personas are unavailable on the parallel portal, and those flows are tested on the current
 portal only. The alternative is to keep the bypass and accept that the Auth0 portal proves only the

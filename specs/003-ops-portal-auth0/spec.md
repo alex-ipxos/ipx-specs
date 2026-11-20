@@ -467,7 +467,7 @@ S3, not on S1.
   **Traced (2026-11-19, research.md R12):** they **do** reach an Auth0 session. The current dev
   release sets `AUTH_BYPASS=1` with the entry gate on (IPX-9880), and in that posture the bypass
   identity replaces the signed-in session. The parallel release must therefore run with
-  `AUTH_BYPASS` off. This is a deployment decision (tasks.md T068).
+  `AUTH_BYPASS` off, as the developer decided on 2026-11-19 (tasks.md T068).
 - **Canon**: the identifiers cited (TRU.IAM.R63, R67, R53) are inherited from IPX-9497 and IPX-9498.
   Whether IPX-9500 carries further canon requirements — in particular anything on portal session
   handling — needs confirming against `domain-docs` (constitution Principle I).
