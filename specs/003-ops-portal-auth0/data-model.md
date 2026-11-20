@@ -24,7 +24,8 @@ is below, with the validation rules that the requirements impose on it.
 ## E1 — Operator session (`OpsSession`)
 
 Where: `apps/ipx-ops/src/server/auth/config.ts`, the exported `OpsSession` type, carried in the
-Auth.js JWT cookie. Lifetime: 8 hours (`session.maxAge`), per deployment.
+Auth.js JWT cookie. Lifetime: 8 hours of inactivity (`session.maxAge`, sliding) on both arms; on the
+Auth0 arm also 12 hours absolute from sign-in, enforced from a sign-in timestamp held in the JWT (FR-015).
 
 | Field | Type | On an Auth0 session | On an Authentik session | Notes |
 |---|---|---|---|---|
@@ -169,7 +170,7 @@ Not application data — configuration, in `ipx-cd/dev-ipxosai-services/values-d
 | FR-011, FR-027 (the actor, and the two values kept apart) | E1 rules 3–4 | asserted by AC-3's test |
 | FR-012 (no roles in the session) | E1 `roles`/`groups`/`entitlements` rows | |
 | FR-013, FR-016 (fail closed, plain refusals) | E3, research.md R7 | |
-| FR-014, FR-015 (sign-out, expiry) | E1 `expires` | existing Auth.js behaviour, unchanged |
+| FR-014, FR-015 (sign-out, expiry) | E1 `expires` | Authentik arm: existing Auth.js behaviour, unchanged. Auth0 arm: sign-out also ends the Auth0 session (`/v2/logout`); a 12-hour absolute lifetime on top of the 8-hour sliding window |
 | FR-017 (every outcome recorded, nothing sensitive) | E4 | |
 | FR-018, FR-019 (validated configuration, own secrets) | E2 | |
 | FR-020, FR-025 (checklist, screen sweep) | — | deliverables of `tasks.md`, not data |

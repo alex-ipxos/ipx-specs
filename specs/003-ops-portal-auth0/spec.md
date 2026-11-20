@@ -265,9 +265,13 @@ portal and every item passes; they then withdraw it and confirm the current port
   unavailable, slow beyond a stated limit, or answers with an error, entry MUST be refused with an
   explanatory message, and no portal screen MUST become reachable.
 - **FR-014**: Operators MUST be able to sign out, which MUST end the portal session and the
-  operator's Auth0 session for the portal.
+  operator's Auth0 session for the portal. On the parallel portal, sign-out ends the Auth.js
+  session and then sends the browser to the tenant's `/v2/logout` with `client_id` and a `returnTo`
+  of the portal's own root, which is already an Allowed Logout URL (auth0-application-setup.md).
 - **FR-015**: A session MUST expire after a stated period of inactivity and a stated absolute
-  lifetime, after which the operator MUST sign in again.
+  lifetime, after which the operator MUST sign in again. On the parallel portal these are **8 hours
+  of inactivity** and **12 hours from sign-in** (decided 2026-11-20 by the developer). The current
+  portal keeps its existing 8-hour window, unchanged (FR-002).
 
 **Operating two portals**
 
