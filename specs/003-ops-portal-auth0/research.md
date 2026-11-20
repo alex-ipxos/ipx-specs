@@ -192,9 +192,12 @@ error boundary (it shows internal error text, which FR-016 forbids); `signIn` ca
 `ipx-cd/dev-ipxosai-services/values-dev.yaml` (working name `web-ipx-ops-auth0`) beside the existing
 `web-ipx-ops`: the same image repository and tag, its own `virtualService.host` (e.g.
 `ops-auth0.ipxos.dev`), its own `env:` block with `AUTH_PROVIDER=auth0` and the Auth0 keys, and its
-own Infisical secret reference. `AUTH_PROVIDER=authentik` is added explicitly to the existing
-release's `env:` block in the same change (belt and braces over R1's default). The two must not
-share a session cookie name, so the parallel release sets a distinct Auth.js cookie prefix.
+own Infisical secret reference. ~~`AUTH_PROVIDER=authentik` is added explicitly to the existing
+release's `env:` block in the same change (belt and braces over R1's default).~~ **Corrected
+2026-11-20**: no line of the existing `web-ipx-ops` release changes (ADR-0052, T044, ipx-cd#2325);
+editing it would roll the current portal, and R1's default already makes it unnecessary. The two must
+not share a session cookie name, so the `auth0` arm sets its own Auth.js session cookie name, derived
+from the provider in `config.ts` (no new setting); the `authentik` arm keeps the default name.
 
 **Rationale**: a second release is the only shape that satisfies FR-003 (no shared session store,
 cookie name, callback address or provider registration) and FR-004 (withdrawable by deleting one

@@ -169,7 +169,8 @@ ipxos-ai/ipx-cd/
 ├── docs/services/ipx-ops.md              # LLD — landed in PR #2199
 └── dev-ipxosai-services/values-dev.yaml  # NEW second deployment (web-ipx-ops-auth0):
                                           #   own host, own env block, own secret ref;
-                                          #   AUTH_PROVIDER=authentik added to the existing block
+                                          #   no line of the existing web-ipx-ops block changes
+                                          #   (ADR-0052; corrected 2026-11-20)
 ```
 
 **Structure Decision**: this feature adds no new project. It changes the sign-in path of one
