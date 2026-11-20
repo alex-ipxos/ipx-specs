@@ -185,7 +185,8 @@ Per constitution Development Workflow item 8:
 |---|---|---|---|
 | `alex-ipxos/ipx-specs` | `003-ops-portal-auth0` | this plan and its Phase 0/1 artefacts | created 2026-11-13 |
 | `ipxos-ai/ipx` | `feat/ipx-9500-ops-portal-auth0` | the app change, plus the three design docs discuss left untracked (`design.same_repo_docs[]`) | **not yet created** — `ipx-branch` cuts it |
-| `ipxos-ai/ipx` | `chore/governance-evidence-sync-ipx-9500` | the governance evidence commit from discuss | exists, local only |
+| `ipxos-ai/ipx` | `chore/governance-evidence-sync-ipx-9500` | the governance evidence commit from discuss | **lost** with the first workstation. Rebuilt 2026-11-20 by the `/ipx-discuss` re-run in the worktree `repos/ipx-9500` (ADR renumbered to 0052) |
+| `ipxos-ai/ipx-cd` | `docs/ipx-9500-lld-adr-0052` | the LLD amendment from the re-run | PR [#2325](https://github.com/ipxos-ai/ipx-cd/pull/2325) open |
 | `ipxos-ai/ipx-cd` | `docs/ipx-9500-ops-portal-auth0-lld` | the LLD update | PR [#2199](https://github.com/ipxos-ai/ipx-cd/pull/2199) open |
 | `ipxos-ai/ipx-cd` | a second branch, at deployment time | the parallel Helm release | not yet created |
 
