@@ -42,25 +42,49 @@ npm run db:up                             # compose Postgres, waits for health
 npm run db:migrate
 npm run dev                               # serves /health
 
-# 3 — the identity provider, locally
-#     The OIDC stub serves discovery, /authorize, /oauth/token, /jwks.json and /userinfo
-#     with locally generated RS256 keys. Point BOTH the portal and svc-identity at it,
-#     so one key set signs the token both sides verify (research.md R5).
+# 3 — the identity provider, locally (T005), in its own terminal
+#     The in-repo OIDC stub serves discovery, /authorize, /oauth/token, /.well-known/jwks.json
+#     and /userinfo, signing with an RS256 key generated at boot (a new key each start).
+#     It signs in a fixed operator without a login form: sub google-apps|e2e-operator-1,
+#     operator@ipxos.ai. Point BOTH the portal and svc-identity at it, so one key set signs
+#     the token both sides verify (research.md R5).
+cd ../ipx/apps/ipx-ops
+node e2e/support/upstreams/oidc-stub.mjs 3026
+#     check: curl -s http://127.0.0.1:3026/.well-known/openid-configuration | jq -r .issuer
+#            → http://127.0.0.1:3026/
+
+# 3b — optional: the fake svc-identity instead of step 2, in its own terminal
+#     Answers POST /v1/users/me with the contract rows; no database. Switch its answer with
+#     curl -s -X POST http://127.0.0.1:3027/__control -d '{"mode":"403"}'
+#     (modes: ok_created | ok_existing | 401 | 403 | 502 | 503 | timeout; {"reset":true} restores)
+node e2e/support/upstreams/svc-identity-fake.mjs 3027
 
 # 4 — the portal, on the Auth0 arm
-cd ../ipx
-# in apps/ipx-ops/.env.local:
+cd ../..                                   # back to the ipx root
+# in apps/ipx-ops/.env.local (the client id is the one the stub accepts; any secret works):
 #   AUTH_PROVIDER=auth0
-#   AUTH_AUTH0_ISSUER=<stub issuer, trailing slash included>
-#   AUTH_AUTH0_ID / AUTH_AUTH0_SECRET=<stub client>
+#   AUTH_AUTH0_ISSUER=http://127.0.0.1:3026/
+#   AUTH_AUTH0_ID=ipx-ops-auth0-e2e
+#   AUTH_AUTH0_SECRET=local-stub-secret
 #   AUTH_AUTH0_AUDIENCE=svc-identity
-#   SVC_IDENTITY_API_URL=http://localhost:<svc-identity port>
+#   SVC_IDENTITY_API_URL=http://127.0.0.1:3027        # the fake, or the real svc-identity's port (T006)
 #   AUTH_BYPASS=0
+#   AUTH_SECRET=<any 32+ characters, local only>
 pnpm dev:ipx-ops
 ```
 
 Expected: `https://ipx-ops.localhost` redirects to the stub, and after signing in lands on
 `/monitor` with the Auth0-portal marker visible.
+
+Status of these commands (2026-11-20): steps 3 and 3b were started and probed on a workstation,
+and the same stub and fake drive the `auth0-portal` Playwright project in CI. The full sequence
+through `pnpm dev:ipx-ops` and a real local svc-identity (step 2, its port and its issuer/JWKS
+settings for the stub) has not been run end to end yet. That is T006 and T049, and the person
+running T066 confirms it.
+
+The stub and fake are what the automated project uses:
+`pnpm --filter @ipx/ipx-ops exec playwright test --project=auth0-portal` starts both on these ports (with the other projects' web servers)
+and runs `e2e/auth0-*.spec.ts`.
 
 ---
 
