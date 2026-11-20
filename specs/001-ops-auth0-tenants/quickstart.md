@@ -29,11 +29,15 @@ curl -s "https://$T.au.auth0.com/.well-known/openid-configuration" | jq -r .issu
 
 - [ ] Applications > ipx-ops > Connections: exactly **one** enabled connection, the ipxos.ai Google
   Workspace connection.
+- [ ] Authentication > Enterprise > the ipxos.ai Google Workspace connection > Applications: only
+  `ipx-ops`, plus, in `ipxos-dev` only, `ipx-ops-auth0` while the IPX-9500 parallel portal is deployed.
+  Any other application is a failure. `ipx-ops-auth0` is checked against
+  `specs/003-ops-portal-auth0/auth0-application-setup.md`, not against this file's data model.
 - [ ] Authentication > Database > Username-Password-Authentication: **Disable Sign Ups** is on, and it
   is enabled for no application.
 - [ ] Authentication > Social > google-oauth2: disabled, or enabled for no application.
-- [ ] Allowed callback, logout and origin URLs match [data-model.md](data-model.md) exactly, with no
-  extra entries.
+- [ ] `ipx-ops`'s allowed callback, logout and origin URLs match [data-model.md](data-model.md)
+  exactly, with no extra entries.
 
 ## 3. Action (failure mode 13)
 

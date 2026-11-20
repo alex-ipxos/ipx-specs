@@ -46,7 +46,7 @@ Production (`ipxos-prd` or similar) is IPX-9504's.
 | strategy | Google Workspace (`google-apps`) |
 | Google Workspace domain | `ipxos.ai` |
 | Google OAuth client | one per tenant, created in Google Cloud. Redirect URI `https://<tenant>.au.auth0.com/login/callback`, Admin SDK API enabled |
-| enabled for | ipx-ops only |
+| enabled for | ipx-ops; in `ipxos-dev` also `ipx-ops-auth0`, the parallel portal (IPX-9500, `specs/003-ops-portal-auth0/auth0-application-setup.md`), while it is deployed. No other application |
 
 Other connections in the tenant: `Username-Password-Authentication` has **Disable Sign Ups** on and
 is enabled for no application. `google-oauth2` (social) is disabled or enabled for no application.
