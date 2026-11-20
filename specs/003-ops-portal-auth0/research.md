@@ -199,8 +199,8 @@ share a session cookie name, so the parallel release sets a distinct Auth.js coo
 **Rationale**: a second release is the only shape that satisfies FR-003 (no shared session store,
 cookie name, callback address or provider registration) and FR-004 (withdrawable by deleting one
 release, with no change to the other). The repository already runs many releases from this one
-values file, so this is the house pattern rather than a new mechanism. Sharing the image tag is what
-makes "the same portal features" true by construction (FR-001, FR-022).
+values file, so this is the house pattern rather than a new mechanism. Sharing the image repository and source is what
+makes "the same portal features" true (FR-001, FR-022). *Superseded in part by R11: the tag is built from the feature branch, not shared with the current release.*
 
 **✅ Settled 2026-11-19 (developer): its own Auth0 application.** The parallel portal gets `ipx-ops-auth0`, a Regular Web Application in `ipxos-dev` only, with its own client id, client secret and Infisical path `/web-ipx-ops-auth0`. Setup, verification and withdrawal are in [auth0-application-setup.md](./auth0-application-setup.md). One consequence for IPX-9497: the Workspace connection becomes enabled for two applications, not one (tasks.md T061). The original question follows for the record.
 
@@ -252,3 +252,43 @@ the published package.
 **Alternatives rejected**: snapshotting the whole auth config (a snapshot would pass while the
 provider silently changed identity); manual verification against the deployed portal (it cannot run
 in CI, and the current portal is not redeployed here anyway).
+
+---
+
+## R11 — The parallel portal runs an image built from the feature branch; nothing merges to `main`
+
+**Decision** (developer, 2026-11-19): this feature's code is **not merged** to `ipx` `main` while the
+two portals run side by side (FR-028). The parallel release runs an image built from
+`feat/ipx-9500-ops-portal-auth0`.
+
+**Why merging would disturb the current portal**: `publish-ipx-ops.yml` runs on every push to
+`main` touching `apps/ipx-ops/**` or `packages/**`. Its `dispatch-dev-image` job then calls
+ipx-cd's `image-update.yml` with `service: web-ipx-ops`, which rewrites
+`services["web-ipx-ops"].image.tag` in `values-dev.yaml` and restarts the current portal on the new
+code. That breaks FR-002, which says the current portal is not restarted, even though the
+Authentik behaviour itself stays identical.
+
+**How the branch image is built**, read from `publish-ipx-ops.yml` on `main`:
+- The workflow has a `workflow_dispatch` trigger. A hand dispatch on the feature branch builds and
+  pushes `web-ipx-ops:<pkg>-<sha7>` and `web-ipx-ops:<sha7>`.
+- `dispatch-dev-image` runs only when `github.event_name == 'push' && github.ref == 'refs/heads/main'`,
+  so a branch dispatch **never** bumps the current release.
+- It also pushes `web-ipx-ops:latest`. No deployment reads `latest`: every ipx-cd release pins an
+  exact tag. Even so, a branch image must not take that name, so T062 changes the workflow, on the
+  feature branch only, to skip `latest` on a non-`main` ref. A dispatch runs the workflow file from
+  the ref it is started on, so the change has effect without reaching `main`.
+- The Sentry release and the Slack notification still fire. They are harmless and help trace the
+  parallel portal.
+
+**How the parallel release is updated**: dev `image-update.yml` accepts only `repository_dispatch`
+(its `workflow_dispatch` is staging-only). The `web-ipx-ops-auth0` tag is therefore set by hand in an
+ipx-cd PR, and image automation never touches it, because automation is keyed by service name.
+
+**Drift**: the branch falls behind `main` as others merge into ipx-ops. To refresh it, rebase onto
+`main`, rerun Phase 3's unchanged suites, re-dispatch the build, and bump only the parallel
+release's tag (T064).
+
+**Alternatives rejected**: (A) merge and let the normal pipeline redeploy the current portal. The
+developer rejected it on 2026-11-19 because it restarts the current portal. (B′) a separate image
+repository (`web-ipx-ops-auth0`): it needs a new GHCR package, permissions and a second Dockerfile
+path for no isolation gain, since tags are already pinned per release.

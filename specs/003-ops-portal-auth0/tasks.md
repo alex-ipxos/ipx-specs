@@ -100,7 +100,7 @@ and the app still starts on the Authentik arm.
 - [ ] T014 [US2] Run `pnpm --filter @ipx/ipx-ops test`, `typecheck` and `test:e2e` **unmodified, with no new environment key set**, and record the result in the governance bundle. A failure here means the Phase 2 default is wrong, not that a test needs editing (**AC-8**)
 - [ ] T015 [P] [US2] Add `it('AC-8: …')` to `apps/ipx-ops/src/server/auth/config.test.ts` asserting that with `AUTH_PROVIDER` unset `getAuthConfig()` registers the **Authentik** provider and **only** that provider (one entry in `providers`), and that the returned config is otherwise equal to today's — basePath, `session.strategy: 'jwt'`, `maxAge: 8 * 60 * 60`, `pages.signIn`, and the three callbacks present
 - [ ] T016 [P] [US2] Add `it('AC-3: …')` to `apps/ipx-ops/src/server/service-token.server.test.ts` asserting `signFactoryServiceToken` is called with `subject: session.user.id` (the provider subject), the same `iss` from `FACTORY_TOKEN_ISSUER`, audience `ipx-factory-services` and the same role set — and that **`platformUserId` appears nowhere in the minted token or its claims** (FR-027, contracts/operator-session.md)
-- [ ] T017 [P] [US2] Add `AUTH_PROVIDER: "authentik"` explicitly to the existing `web-ipx-ops` release's `env:` block in `dev-ipxosai-services/values-dev.yaml` (`ipx-cd`) — belt and braces over the Phase 2 default, so the current deployment's provider is stated rather than inferred
+- ~~T017~~ **Removed 2026-11-19.** Adding `AUTH_PROVIDER: "authentik"` to the current `web-ipx-ops` release would change its pod spec and restart it, which breaks FR-002. R1's default is enough. The ipx-cd change must touch **no** line of the `web-ipx-ops` block (FR-028)
 
 **Checkpoint**: the current portal's behaviour is provably unchanged, by its own existing checks.
 
@@ -202,15 +202,18 @@ item passes, then withdraws the release and confirms the current portal is healt
 
 ### Delivery (not deployed until the developer approves — plan.md Delivery constraints)
 
-- [ ] T044 [US5] Add the second Helm release `web-ipx-ops-auth0` to `dev-ipxosai-services/values-dev.yaml` (`ipx-cd`): the **same** image repository and tag as `web-ipx-ops`, its own `virtualService.host`, its own `env:` block with `AUTH_PROVIDER=auth0` plus the four `AUTH_AUTH0_*` keys and `SVC_IDENTITY_API_URL`, its own Infisical secret reference, its own `AUTH_SECRET`, and **a distinct Auth.js session cookie name** — the two must share no session store, cookie name, callback address or provider registration (FR-003, data-model.md E5)
+- [ ] T044 [US5] Add the second Helm release `web-ipx-ops-auth0` to `dev-ipxosai-services/values-dev.yaml` (`ipx-cd`): the same image **repository** as `web-ipx-ops` with the tag **built from the feature branch by T063**, pinned by hand (never the current release's tag, and never `latest`), its own `virtualService.host`, its own `env:` block with `AUTH_PROVIDER=auth0` plus the four `AUTH_AUTH0_*` keys and `SVC_IDENTITY_API_URL`, its own Infisical secret reference, its own `AUTH_SECRET`, and **a distinct Auth.js session cookie name** — the two must share no session store, cookie name, callback address or provider registration (FR-003, data-model.md E5). **The PR's diff touches no line of the `web-ipx-ops` release** (FR-028). Check this with `git diff` before asking for approval
+- [ ] T062 [US5] In `ipx` **on the feature branch only**, change `.github/workflows/publish-ipx-ops.yml` so that a run on a ref other than `refs/heads/main` pushes only `<pkg>-<sha7>` and `<sha7>` and **not** `latest`. Leave `dispatch-dev-image`'s `main`-only condition exactly as it is (research.md R11). Lands through `/ipx-fix`
+- [ ] T063 [US5] Build the parallel portal's image: dispatch `publish-ipx-ops.yml` by hand on `feat/ipx-9500-ops-portal-auth0`, and record the resulting `<pkg>-<sha7>` tag for T044. Confirm the run shows **no** `dispatch-dev-image` job, no image-update run appeared in ipx-cd, and `services["web-ipx-ops"].image.tag` on ipx-cd `main` is unchanged. **Held until deployment approval**
 - [ ] T045 [US5] Create the `ipx-ops-auth0` Regular Web Application in `ipxos-dev` per [auth0-application-setup.md](./auth0-application-setup.md) steps 1–3 and 5: the callback `https://<T044 host>/api/auth/callback/auth0` and nothing else, logout URL and web origin `https://<T044 host>`, Authorization Code as the only grant, RS256, OIDC Conformant, **no connection enabled yet**. Depends on the `ipxos-dev` tenant existing (**IPX-9497**) and on T044 fixing the host. **Held until deployment approval**
 - [ ] T058 [US5] Allow `ipx-ops-auth0` to request the `svc-identity` audience for users (setup guide step 4). This changes the API's application-access policy only if that policy requires per-application authorisation. **Held**
 - [ ] T059 [US5] Enable the ipxos.ai Google Workspace connection for `ipx-ops-auth0`, and nothing else (setup guide step 6). Then run the step 7 tenant checks: an `@ipxos.ai` login succeeds under `ipx-ops-auth0`; a Google account outside ipxos.ai is refused by `Restrict to ipxos.ai`; the access token has `iss` byte-exact, `aud` ∋ `svc-identity` and `alg` RS256. Record the outcome in the T046 checklist. **Held**
 - [ ] T060 [US5] Provision Infisical `/web-ipx-ops-auth0` (dev only, a path separate from `/web-ipx-ops`) with `AUTH_AUTH0_ID`, `AUTH_AUTH0_SECRET`, `AUTH_AUTH0_ISSUER` (byte-exact, trailing slash) and a **new** `AUTH_SECRET`, and point T044's secret reference at it (FR-019). Do not set non-secret keys there. `AUTH_PROVIDER`, `AUTH_AUTH0_AUDIENCE` and `SVC_IDENTITY_API_URL` live in the release's `env:` block. **Held**
 - [ ] T061 [P] Amend `specs/001-ops-auth0-tenants/data-model.md` (Connection, "enabled for") and the IPX-9497 checklist in `specs/001-ops-auth0-tenants/quickstart.md`: the Workspace connection is enabled for `ipx-ops` **and** `ipx-ops-auth0` (dev only), so a re-run of IPX-9497's checklist does not flag the second application as a failure (owner of **IPX-9497**)
+- [ ] T064 [US5] Write the refresh procedure in `specs/003-ops-portal-auth0/runbook.md` (with T046). Rebase the feature branch onto `ipx` `main`, rerun T014's unchanged suites, re-dispatch T063, and open an ipx-cd PR that changes **only** `services["web-ipx-ops-auth0"].image.tag`. This keeps the parallel portal on the same features as the current one (FR-001) without merging (FR-028)
 - [ ] T046 [US5] Write the deployment-and-verification checklist and the withdrawal procedure at `specs/003-ops-portal-auth0/runbook.md`, covering FR-001–FR-019 and FR-024–FR-027, runnable by an administrator who did not perform the deployment, and including the screen sweep of T047 and the "delete this release only" withdrawal, followed by the Auth0-side withdrawal in [auth0-application-setup.md](./auth0-application-setup.md) → Withdrawal (FR-020, **AC-14**)
 - [ ] T047 [US5] Run the FR-025 screen sweep on the parallel portal and record **every** screen in the T046 checklist as working, or refused with its reason. The cohort-gated and system-operator-gated screens (hierarchy read and write, the retention/compliance screen, the CRM cases/case/run/calendar screens) are expected to show their existing plain-words notice **pending IPX-9502** — recorded as refused, not as a defect, and never left unverified or showing empty data as if it were real (**AC-11**)
-- [ ] T048 [US5] Have someone who did not deploy it run the T046 checklist end to end, then withdraw the release and confirm the current portal is healthy with no change and no redeploy, within SC-007's 15 minutes (**AC-14**)
+- [ ] T048 [US5] Have someone who did not deploy it run the T046 checklist end to end, then withdraw the release and confirm the current portal is healthy with no change and no redeploy. Its `web-ipx-ops` image tag and pod start times are the same before the parallel deploy, after it and after withdrawal, within SC-007's 15 minutes (**AC-14**)
 
 **Checkpoint**: two portals run side by side, distinguishable at a glance, and the parallel one is withdrawable.
 
@@ -220,7 +223,7 @@ item passes, then withdraws the release and confirms the current portal is healt
 
 - [ ] T049 [P] Run the full quickstart Scenario 1–3 sequence from a clean clone and confirm `specs/003-ops-portal-auth0/quickstart.md` is accurate command-for-command (constitution Principle VIII, FR-021, **AC-10**)
 - [ ] T050 [P] Update `apps/ipx-ops/CONTEXT.md` and `apps/ipx-ops/README.md`: the provider is selected by `AUTH_PROVIDER`, the session carries `platformUserId` beside `user.id`, and the README's `OPS_SYSTEM_OPERATOR_SUBS` paragraph names that those values are **provider subjects** on either arm — not platform user ids (the correction IPX-9502 now depends on)
-- [ ] T051 [P] Update `docs/services/ipx-ops.md` (`ipx-cd`) from design to as-built once the code PR merges: §1 the review row, §6.1 the svc-identity row's client and timeout as shipped, §8.1/§8.2 the keys as shipped, §13 the two failure rows, §19 the change-log entry. Lands as a separate doc PR, as PR #2199 did
+- [ ] T051 [P] Update `docs/services/ipx-ops.md` (`ipx-cd`) from design to as-built once the parallel portal is deployed from the feature branch (the code PR does not merge, FR-028): §1 the review row, §6.1 the svc-identity row's client and timeout as shipped, §8.1/§8.2 the keys as shipped, §13 the two failure rows, §19 the change-log entry. Lands as a separate doc PR, as PR #2199 did
 - [ ] T052 [P] Correct the dead `ipx-ops ADR-0040` citations in `specs/001-ops-auth0-tenants/plan.md` and `specs/001-ops-auth0-tenants/data-model.md` to `ipx-ops ADR-0051` — the file they name does not exist on `ipx` `main`, and 0040 is the Standard-UX ADR (discuss finding F1, owner of **IPX-9497**)
 - [ ] T053 [P] Update the Open Questions section of `specs/003-ops-portal-auth0/spec.md`: the governance question is answered (ADR-0051 and decisions D1–D5), and the dev-officer / dev-persona question is traced — see T054
 - [ ] T054 Trace the two dev-only paths that reference the current provider's actor form against an Auth0 session and record the outcome in `specs/003-ops-portal-auth0/research.md`: the dev-officer switch (`apps/ipx-ops/src/lib/dev-officer.ts`, which overrides `session.user.id` with a seeded `did:authentik:<id>` subject) and the `dev_persona` actor type (`apps/ipx-ops/src/server/service-token.server.ts`). Both are fenced to the `AUTH_BYPASS` posture, so neither should reach an Auth0 session — **verify rather than assume** (the spec's own third Open Question)
@@ -240,8 +243,8 @@ item passes, then withdraws the release and confirms the current portal is healt
 - **Phase 4 (US1)**: depends on Phase 2. T020 is shared groundwork for US4
 - **Phase 5 (US3)**: depends on Phase 4 (there must be an Auth0 sign-in before there is anything to resolve)
 - **Phase 6 (US4)**: depends on Phase 5 for the svc-identity refusals (T037, T039) and on T020 for the error page; the Auth0-side refusals (T033's first three rows, T035's provider rows) need only Phase 4
-- **Phase 7 (US5)**: the marker (T040–T043) depends only on Phase 2; the delivery tasks (T044–T048, T058–T060) depend on **every** story, on T004, and on **IPX-9497** and **IPX-9499**. Within delivery the order is T044 (host) → T045 → T058 → T059 → T060 → T046 → T047 → T048. T061 can run at any time
-- **Phase 8 (Polish)**: T049 depends on Phases 2–6; T051 depends on the code PR merging; T052, T053, T055, T056 are independent and can run at any time
+- **Phase 7 (US5)**: the marker (T040–T043) depends only on Phase 2; the delivery tasks (T044–T048, T058–T060, T062–T064) depend on **every** story, on T004, and on **IPX-9497** and **IPX-9499**. Within delivery the order is T062 → T063 (image) → T044 (host, tag) → T045 → T058 → T059 → T060 → T046 → T047 → T048. T061 can run at any time
+- **Phase 8 (Polish)**: T049 depends on Phases 2–6; T051 depends on the parallel deployment (the code PR stays unmerged, FR-028); T052, T053, T055, T056 are independent and can run at any time
 
 ### Story dependencies
 
@@ -261,7 +264,7 @@ the session shape before the guard that enforces it.
 
 - **Phase 1**: T002–T006 all parallel (different files, different repos)
 - **Phase 2**: T007 ∥ T008 (RED); then T012 ∥ T013 after T009
-- **Phase 3**: T015 ∥ T016 ∥ T017 after T014
+- **Phase 3**: T015 ∥ T016 after T014 (T017 removed)
 - **Phase 4**: T018 ∥ T019 (RED)
 - **Phase 5**: T024 ∥ T025 ∥ T026 ∥ T027 (RED)
 - **Phase 6**: T032 ∥ T033 ∥ T034 ∥ T035 (RED)
@@ -334,3 +337,5 @@ immediately; but it cannot be demonstrated without a reachable svc-identity.
   T052 → IPX-9497, T061 → IPX-9497, T055 → IPX-9501)
 - Nothing is merged or deployed until the developer explicitly approves it, including the parallel
   deployment itself
+- **The `ipx` code PR is never merged by this feature** (FR-028). It stays a draft. `/ipx-pr` and
+  `/ipx-merge` are not run, and merging is IPX-9504's decision at switch-over

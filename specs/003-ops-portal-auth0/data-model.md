@@ -142,7 +142,7 @@ Not application data — configuration, in `ipx-cd/dev-ipxosai-services/values-d
 
 | Property | Current (`web-ipx-ops`) | Parallel (`web-ipx-ops-auth0`) |
 |---|---|---|
-| Image | `web-ipx-ops:<tag>` | **the same repository and tag** (FR-001, FR-022) |
+| Image | `web-ipx-ops:<tag>` built from `main`, bumped by automation | the same repository, a tag **built from the feature branch** and pinned by hand. Automation never touches it (FR-028, research.md R11) |
 | Host | `ops.ipxos.dev` | its own, e.g. `ops-auth0.ipxos.dev` |
 | `AUTH_PROVIDER` | `authentik` (set explicitly; also the default) | `auth0` |
 | Session cookie | as today | **a distinct name** (FR-003) |

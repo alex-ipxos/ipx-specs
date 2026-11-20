@@ -316,6 +316,10 @@ portal and every item passes; they then withdraw it and confirm the current port
   identifier as two separate values. The provider subject is what the outbound service-call token
   carries as the actor (FR-024); the platform user identifier is held for later work (FR-010) and
   MUST NOT be substituted for the provider subject anywhere a service call is made.
+- **FR-028**: This feature's code MUST NOT be merged to `main` while the two portals run side by side
+  (decided 2026-11-19). The parallel portal runs an image built from the feature branch, and the
+  current portal's image tag, configuration and pods stay exactly as they are. Merging is a
+  separate, later decision taken when the switch-over is decided (IPX-9504), not part of this feature.
 - **FR-023**: Decommissioning the Authentik portal, migrating anything held against Authentik
   identities, and production rollout are out of scope and MUST be left to IPX-9504.
 

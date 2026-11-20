@@ -206,6 +206,11 @@ were returned to `main` after the discuss turn.
   AC-2 and AC-10 are demonstrated against a locally run svc-identity, and FR-010 holds in an
   environment only once svc-identity answers there.
 - **Dev only** (FR-005). Staging and production are IPX-9504.
+- **The code stays off `main`** (FR-028, research.md R11). The `ipx` PR stays a draft and is not
+  merged. A push to `main` would run `publish-ipx-ops.yml`, whose `dispatch-dev-image` job bumps
+  `web-ipx-ops` and restarts the current portal. The parallel portal's image is built by dispatching
+  that workflow by hand on the feature branch, and the ipx-cd change touches no line of the
+  `web-ipx-ops` release.
 - Application code is written only through `ipx-fix`, test-first.
 
 ## Complexity Tracking
