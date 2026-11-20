@@ -453,11 +453,21 @@ S3, not on S1.
   repository, and the discuss skill was not available in the session that produced this spec. This
   spec was written from the user's instruction and the delivered IPX-9497 and IPX-9498 artifacts, and
   MUST be reconciled with the discuss output for IPX-9500 before `/speckit-plan`.
+  **Answered (2026-11-19):** `/ipx-discuss IPX-9500` ran on 2026-11-13 and produced ipx-ops ADR-0051
+  (decisions D1–D5), the sequence and architecture docs, and the merged LLD change ipx-cd#2199. The
+  plan is built from that output. ⚠️ The ADR, the docs and the governance binding exist only on the
+  workstation that ran discuss: none of them is on this machine or on the `ipx` remote. The number
+  0051 has since been taken on `ipx` `main` (#4681), so the ADR needs a new number when it lands
+  (tasks.md T001).
 - **S3 and S4 have no tickets.** Both are prerequisites for retiring the current portal, and S4
   gates S2. They should be filed before IPX-9504 is planned, not during it.
 - **Two dev-only paths reference the current provider's actor form** (the dev-officer switch and the
   dev-persona actor type, ipx-ops ADR-0014). Whether they still behave on an Auth0 session has not
   been traced and MUST be checked in `/speckit-plan`.
+  **Traced (2026-11-19, research.md R12):** they **do** reach an Auth0 session. The current dev
+  release sets `AUTH_BYPASS=1` with the entry gate on (IPX-9880), and in that posture the bypass
+  identity replaces the signed-in session. The parallel release must therefore run with
+  `AUTH_BYPASS` off. This is a deployment decision (tasks.md T068).
 - **Canon**: the identifiers cited (TRU.IAM.R63, R67, R53) are inherited from IPX-9497 and IPX-9498.
   Whether IPX-9500 carries further canon requirements — in particular anything on portal session
   handling — needs confirming against `domain-docs` (constitution Principle I).

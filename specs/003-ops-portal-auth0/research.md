@@ -292,3 +292,66 @@ release's tag (T064).
 developer rejected it on 2026-11-19 because it restarts the current portal. (B′) a separate image
 repository (`web-ipx-ops-auth0`): it needs a new GHCR package, permissions and a second Dockerfile
 path for no isolation gain, since tags are already pinned per release.
+
+---
+
+## R12 — The dev bypass paths **do** reach an Auth0 session (T054)
+
+**Finding** (read from `ipxos-ai/ipx` `origin/main` on 2026-11-19, and already true at the plan's
+snapshot `bf7eb66c3`): `getCurrentOpsSessionData` in `apps/ipx-ops/src/server/auth/session-data.server.ts`
+has two arms.
+- **Entry gate on** (`AUTH_ENTRY_GATE_ENABLED !== '0'`, IPX-9880 #4274): a real session is required
+  first, then `return (await getDevBypassSession()) ?? session`. Whenever the bypass is available
+  (`AUTH_BYPASS=1` and `ENVIRONMENT ∈ {local, development, staging, test}`), the **bypass identity
+  replaces** the signed-in one: `user.id` becomes `dev-operator`, a seeded officer or the system
+  operator.
+- **Entry gate off**: the bypass session is returned without any sign-in.
+
+The current dev release `web-ipx-ops` sets `ENVIRONMENT: "development"`, `AUTH_ENTRY_GATE_ENABLED: "1"`
+and `AUTH_BYPASS: "1"` (ipx-cd `values-dev.yaml`). A parallel release that copied that `env:` block
+would sign the operator in through Auth0 and then:
+- drop the Auth0 session in favour of `devBypassSession`, which has **no `platformUserId`** (data-model
+  E1 rule 2), so US3/AC-2 are never observable;
+- mint factory tokens with `sub = dev-operator` or an officer id, not the Auth0 subject, which breaks
+  AC-3/FR-024 as the plan states them; and the underwriting calls carry `actorType: dev_persona`
+  (`devPersonaActorTypeFor`) on top.
+
+The dev-officer override and `dev_persona` therefore are **not** fenced away from an Auth0 session.
+They are fenced only by `AUTH_BYPASS`.
+
+**Decision needed (T068)**: the parallel release sets `AUTH_BYPASS: "0"`, or leaves it unset, so the
+Auth0 sign-in is what the portal uses. The cost is that the officer switch (three-way capsule approval)
+and the demo personas are unavailable on the parallel portal, and those flows are tested on the current
+portal only. The alternative is to keep the bypass and accept that the Auth0 portal proves only the
+sign-in, not the binding or the actor. That would hollow out US3, so it is not recommended. Either way
+the current release is untouched. This also bears on IPX-10983: on today's `main` the bypass is
+already "demo identities behind a real sign-in", not "auth off", whenever the entry gate is on.
+
+**Test consequence**: T026's AC-9 case (the bypass session is admitted and has no `platformUserId`)
+still holds. Add one case to T026: with `AUTH_BYPASS` unset and the entry gate on, an Auth0 session
+carrying `platformUserId` is returned **as is** by `getCurrentOpsSessionData`.
+
+---
+
+## R13 — IPX-9501 is already satisfied (T055); FR-026's weakness recorded (T056)
+
+**IPX-9501** ("give the factory-token issuer its own setting, keeping today's value"):
+`mintFactoryServiceToken` in `apps/ipx-ops/src/server/service-token.server.ts` reads
+`process.env.FACTORY_TOKEN_ISSUER`, which has been independent of the login provider since IPX-2123
+(#2135, commit `7a43aa806`). The current dev release sets it to
+`https://auth.ipxos.dev/application/o/ipx-ops-dev/`, today's value. Nothing in this feature reads
+the login issuer for outbound tokens. **IPX-9501 can be closed as already delivered.** It is still
+open (Backlog), and closing it is the developer's call.
+
+**FR-026, a known weakness**: rows written from the parallel portal can be told apart only by the
+**shape** of the actor subject: an Auth0 `sub` (e.g. `google-apps|…`) against an Authentik one. There
+is no explicit marker. The same person also appears as two different actors across the two portals,
+so "is this mine" checks treat the other portal's rows as someone else's. The checks are in
+`src/server/product-factory-approval-data.server.ts` (self-approval and "you wrote this"),
+`src/lib/hierarchy-copy.ts` and `src/lib/actor-label.ts`, all on `main`. Example: an operator who
+drafts on the current portal and opens the item on the parallel one is not recognised as its author.
+This is acceptable for a dev-only side-by-side run, and it must be stated in the T046 checklist.
+**IPX-9503** ("handle pre-cutover Authentik actor ids and drop `did:authentik:` comparisons") is
+where it gets fixed. Its premise is a single-provider cutover, so it needs re-scoping around two
+providers live at once.
+
