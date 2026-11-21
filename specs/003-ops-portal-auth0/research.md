@@ -166,7 +166,7 @@ text:
 |---|---|---|
 | `domain_refused` | "Access is limited to ipxos.ai accounts." | Auth0 `access_denied` from the deny-only Action |
 | `provider_unavailable` | "Sign-in is temporarily unavailable. Try again shortly." | discovery / token-exchange failure |
-| `callback_rejected` | the sign-in page itself, no message | replayed, late or state-mismatched callback |
+| `callback_rejected` | the sign-in page itself, no message | replayed or late callback: a missing or invalid PKCE verifier, or a code already used (`invalid_grant`). Auth.js's default checks are PKCE only, so no `state` is sent on either portal |
 | `identity_unavailable` | "We could not complete sign-in. Please try again." | svc-identity unreachable, timeout, 401, 502, 503 |
 | `access_not_available` | "Your access is not available. Contact the platform team." | svc-identity `403 user_disabled` |
 

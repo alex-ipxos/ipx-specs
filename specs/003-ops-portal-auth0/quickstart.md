@@ -130,7 +130,7 @@ stops a later change quietly turning the platform user id into the estate's acto
 | Make svc-identity answer `403 user_disabled` (disable the user in its database) | the distinct "Your access is not available. Contact the platform team."; no Sentry event | AC-5 |
 | Hold svc-identity past 3 s | the retry message, after ~3 s, not a hang | AC-5 |
 | Stop the OIDC stub, then sign in | "Sign-in is temporarily unavailable. Try again shortly." | AC-6 |
-| Re-open a used callback URL, or tamper with `state` | back to sign-in, no session | AC-6 |
+| Re-open a used callback URL, or clear the PKCE verifier cookie before the callback | back to sign-in, no session | AC-6 |
 | Unset `AUTH_AUTH0_ISSUER` with `AUTH_PROVIDER=auth0` | the process refuses to serve, naming the key and **not** its value | AC-7 |
 | Set `AUTH_PROVIDER=auth-zero` | refuses to serve; never falls back to Authentik | AC-7 |
 | `AUTH_BYPASS=1`, `ENVIRONMENT=development` | the dev picker works as today, no Auth0 or svc-identity call, no `platformUserId` on the session | AC-9 |
