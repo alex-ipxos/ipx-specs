@@ -1,4 +1,4 @@
-# Resume here: IPX-9500 status (updated 2026-11-25, after the sandbox rehearsal)
+# Resume here: IPX-9500 status at pause (2026-11-25, after the sandbox rehearsal)
 
 Read this first in a new session, then [tasks.md](./tasks.md) and [runbook.md](./runbook.md).
 When the work below is done, update this file or delete it. It is a pointer, not a status ledger.
@@ -15,7 +15,14 @@ When the work below is done, update this file or delete it. It is a pointer, not
 
 ## Next steps, in order
 
-1. **Tick T066 in tasks.md** (the developer does this; the sign-off is already posted).
+0. **Housekeeping first** (developer):
+   - **reboot the Mac** (54 days up; TIME_WAIT sockets were stuck, and the stopgap `portrange.first=16384` is lost on reboot anyway)
+   - after the reboot, start the proxy again if a local run is needed
+   - delete the sandbox app `ipx-ops-auth0` in `dev-ipxos-play` once no further sandbox runs are wanted
+   - delete the scratchpad `sandbox-auth0-creds.txt`
+1. **Check CI on `34c9504`** (PR #4687). At pause: Seer, dependency-review and linear-reference passed; E2E, CodeQL and detect-changes were pending. The full unit suite has **not** run locally on `34c9504` (it was stopped when the Mac ran out of ports), so CI is the evidence. If E2E fails, look first at the new `@AC-4 … Try again asks the provider for its login page` test in `e2e/auth0-refusals.spec.ts`.
+
+1a. **Tick T066 in tasks.md** (the developer does this; the sign-off is already posted).
 2. **Re-run the governance chain on `34c9504`** (pre-audit, audit, verify-qa, verify-gov) and check CI on it. T066 was signed at `88627a8`; decide whether the Try-again change needs a T066 re-run (it touches the refusal path, AC-4/AC-6).
 3. **Get the developer's approval for the live steps**, then T045 (the Auth0 `ipx-ops-auth0` app in `ipxos-dev`, callbacks `https://ops-auth0.ipxos.dev/api/auth/callback/auth0` and `https://ipx-ops.localhost/api/auth/callback/auth0`), T058 (`svc-identity` audience), T059 (Workspace connection) and T060 (Infisical `/web-ipx-ops-auth0`: Auth0 id, secret and issuer, a new `AUTH_SECRET`, copies of the shared keys, no `AUTH_AUTHENTIK_*`). See [auth0-application-setup.md](./auth0-application-setup.md). It is not yet known whether the agent has Auth0 or Infisical access, or whether the developer does these by hand.
 4. **T065 [HUMAN]**: a local run against the real tenant (blocked until IPX-9497 creates `ipxos-dev`; the sandbox rehearsal above passed), using the same setup as T066 (below), with the issuer switched to `https://ipxos-dev.au.auth0.com/` on both the portal and svc-identity.
@@ -50,6 +57,25 @@ When the work below is done, update this file or delete it. It is a pointer, not
    - the replay row cannot be run from browser history, because sign-out immediately starts a new sign-in; use a direct request
    - a Mac up for more than ~49.7 days stops reaping TIME_WAIT sockets; a long local run (or the full unit suite) then exhausts ephemeral ports and everything fails with `EADDRNOTAVAIL`. Reboot, or `sudo sysctl -w net.inet.ip.portrange.first=16384` as a stopgap (applied 2026-11-25, lasts until reboot)
    - the repo's hooks need Node 24 (`~/.nvm/versions/node/v24.22.1`); on Node 22 the oxlint plugin fails to load
+
+## Deferred by the developer
+
+- **Login page branding (IPX Insure logo and name):** not now. When it is wanted, it is tenant-wide Auth0 config, not code:
+  - Settings > General > Friendly Name `IPX Insure`
+  - Branding > Universal Login: logo at a public HTTPS URL (PNG about 150×150; artwork in `packages/logos/assets/ipx-combined.svg`, not yet hosted anywhere public)
+  - optionally, the login prompt text
+  - do **not** add it to the IPX-9497 runbook until the developer asks
+
+## Local state at pause
+
+- Stopped: portal, svc-identity. Still running: the portless proxy (root) and the `svc-identity-t066` Postgres container (`npm run db:down` to stop).
+- ipx-t066 is detached at **`34c9504`**, and its `.env.local` is on the **sandbox Auth0 arm**:
+  - `AUTH_PROVIDER=auth0`
+  - issuer `https://dev-ipxos-play.eu.auth0.com/`, with the sandbox client id and secret
+  - entry gate on, bypass off
+- svc-identity-t066 `.env` has `IDENTITY_ISSUER=https://dev-ipxos-play.eu.auth0.com/`. Point both back at `http://127.0.0.1:3026/` for stub runs.
+- The DB holds the sandbox platform user `46459f2a-…` (one `google-oauth2` link) next to the stub user `62ddfe1c-…`.
+- Use Node 24 (`~/.nvm/versions/node/v24.22.1/bin`) for git hooks in the ipx repo.
 
 ## The T066/T065 local setup (to rebuild it)
 
