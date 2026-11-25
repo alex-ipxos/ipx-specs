@@ -74,7 +74,7 @@ When the work below is done, update this file or delete it. It is a pointer, not
   - issuer `https://dev-ipxos-play.eu.auth0.com/`, with the sandbox client id and secret
   - entry gate on, bypass off
 - svc-identity-t066 `.env` has `IDENTITY_ISSUER=https://dev-ipxos-play.eu.auth0.com/`. Point both back at `http://127.0.0.1:3026/` for stub runs.
-- The DB holds the sandbox platform user `46459f2a-…` (one `google-oauth2` link) next to the stub user `62ddfe1c-…`.
+- The local svc-identity DB was emptied on 2026-11-25 for a demo (0 links, 0 users; schema and migrations kept). The next sign-in creates a fresh platform user.
 - Use Node 24 (`~/.nvm/versions/node/v24.22.1/bin`) for git hooks in the ipx repo.
 
 ## The T066/T065 local setup (to rebuild it)
