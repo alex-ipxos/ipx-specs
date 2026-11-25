@@ -10,12 +10,12 @@ When the work below is done, update this file or delete it. It is a pointer, not
 | Code, `ipxos-ai/ipx` PR #4687 (`feat/ipx-9500-ops-portal-auth0`) | Ready for review, CI green, **do-not-merge** (FR-028). Governance chain complete through verify-gov, signed at `88627a8`. **0 unresolved review threads**: Sentry (double `normalizeAuthRequestUrl`, harmless on Node 22) and CodeQL (test-only stub redirect) were both answered and resolved on 2026-11-25. CodeQL alert #61 itself is **not** dismissed yet |
 | Delivery, `ipxos-ai/ipx-cd` draft PR #2405 (`chore/ipx-9500-web-ipx-ops-auth0`) | T044 + T068 written. `web-ipx-ops-auth0` on `ops-auth0.ipxos.dev`, `enabled: false`, tag `PENDING-T063`. 0 lines of `web-ipx-ops` changed. **Do not merge before T067** |
 | Specs (this branch) | T062, T068 ticked. Decisions recorded: host `ops-auth0.ipxos.dev`; `/web-ipx-ops-auth0` holds **copies** of the shared `/web-ipx-ops` keys (not a second mount) |
-| T066 [HUMAN] | **Run and passed on 2026-11-25 at `88627a8`. Sign-off comment NOT yet posted on IPX-9500**, and the box stays unticked until it is. Draft below |
+| T066 [HUMAN] | **PASS at `88627a8` on 2026-11-25. Sign-off posted on IPX-9500** (comment `b224c6fb`). Unit 24371 passed, typecheck pass. **The developer ticks the box** (an agent never ticks a [HUMAN] task) |
 | Code tasks T002–T043, T069, T070 | Built on the code branch but still unticked in tasks.md. Tick them after a per-task check |
 
 ## Next steps, in order
 
-1. **Post the T066 sign-off** on IPX-9500 from the draft below. Before posting, fill in the unit-suite result: rerun `TZ=UTC pnpm --filter @ipx/ipx-ops test --run` at `88627a8` if the 2026-11-25 run's result was lost. Typecheck passed (exit 0). Then tick T066.
+1. **Tick T066 in tasks.md** (the developer does this; the sign-off is already posted).
 2. **Get the developer's approval for the live steps**, then T045 (the Auth0 `ipx-ops-auth0` app in `ipxos-dev`, callbacks `https://ops-auth0.ipxos.dev/api/auth/callback/auth0` and `https://ipx-ops.localhost/api/auth/callback/auth0`), T058 (`svc-identity` audience), T059 (Workspace connection) and T060 (Infisical `/web-ipx-ops-auth0`: Auth0 id, secret and issuer, a new `AUTH_SECRET`, copies of the shared keys, no `AUTH_AUTHENTIK_*`). See [auth0-application-setup.md](./auth0-application-setup.md). It is not yet known whether the agent has Auth0 or Infisical access, or whether the developer does these by hand.
 3. **T065 [HUMAN]**: a local run against the real tenant, using the same setup as T066 (below), with the issuer switched to `https://ipxos-dev.au.auth0.com/` on both the portal and svc-identity.
 4. Then T063 (build the T065 SHA), fill in T044's tag and `enabled: true`, **T067 [HUMAN]** approval, merge (that is the deployment), T047, T048.
@@ -55,7 +55,7 @@ When the work below is done, update this file or delete it. It is a pointer, not
   At pause it was left on the **Authentik arm**: no `AUTH_PROVIDER`, `AUTH_BYPASS=1`, `AUTH_ENTRY_GATE_ENABLED=0`.
 - `test:e2e` cannot run locally without `ldcli`. Use CI's E2E run on the same SHA (run 44916151224 for `88627a8`).
 
-## T066 sign-off draft (post on IPX-9500, then tick T066)
+## T066 sign-off as posted (IPX-9500 comment b224c6fb; the unit result there reads 1809 files, 24371 passed)
 
 ```
 [HUMAN SIGN-OFF] T066 — Alexander Valyalkin, 2026-11-25, 88627a844eca05e970d8fd8087ca3126562ec086, PASS, local setup against the stub
