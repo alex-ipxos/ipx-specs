@@ -60,7 +60,9 @@ once the parallel portal is withdrawn or switched over.
 4. **API access.** Applications > APIs > `svc-identity` > Application Access (or the API's user
    access policy, depending on the dashboard version). If the policy requires each application to
    be authorised for user access, authorise `ipx-ops-auth0`. If the policy allows every
-   application, change nothing. Either way, step 7 shows whether it worked: the access token's
+   application, change nothing. In the 2026-11-25 sandbox rehearsal the policy was **per-app
+   authorisation**: grant **User-delegated Access** only and leave Client Access off (the app has no
+   Client Credentials grant). Either way, step 7 shows whether it worked: the access token's
    `aud` contains `svc-identity`.
 5. **Connections tab.** Confirm that **no** connection is enabled yet. "Enable Application
    Connections" is off, so a new application starts with none. If any are enabled, the tenant flag
