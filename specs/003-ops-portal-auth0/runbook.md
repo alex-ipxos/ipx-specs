@@ -86,7 +86,7 @@ in §3 (FR-003).
    | `AUTH_BYPASS` | `"0"` or absent (T068). The officer switch and demo personas are **unavailable** on this portal | [ ] |
    | `ENVIRONMENT` | `development` | [ ] |
    | `AUTH_ENTRY_GATE_ENABLED` | `"1"` | [ ] |
-   | secret reference | Infisical `/web-ipx-ops-auth0`, holding `AUTH_AUTH0_ID`, `AUTH_AUTH0_SECRET`, `AUTH_AUTH0_ISSUER` and its own new `AUTH_SECRET` | [ ] |
+   | secret reference | Infisical `/web-ipx-ops-auth0`, holding `AUTH_AUTH0_ID`, `AUTH_AUTH0_SECRET`, `AUTH_AUTH0_ISSUER`, its own new `AUTH_SECRET` and copies of the other `/web-ipx-ops` keys (identical `JWT_SECRET`), with no `AUTH_AUTHENTIK_*` key | [ ] |
 
    - [ ] `git diff main -- dev-ipxosai-services/values-dev.yaml` changes **no line** of the `web-ipx-ops` release.
 4. **T067 [HUMAN] Sign-off 3.** Confirm the following, then record the sign-off and merge:
@@ -215,7 +215,8 @@ the code (FR-028).
 2. Rerun T014's unchanged suites with no new key set: `pnpm --filter @ipx/ipx-ops test`, `typecheck` and `test:e2e`. CI on the PR must be green, including the `auth0-portal` project.
 3. **[HUMAN] Rerun T065** on the rebased SHA, including the §1 cookie check. The comment names that SHA.
 4. Re-dispatch T063 on that SHA, with the same checks as §2 step 2.
-5. Open an ipx-cd PR that changes **only** `services["web-ipx-ops-auth0"].image.tag`.
+5. Open an ipx-cd PR that changes **only** `services["web-ipx-ops-auth0"].image.tag`, plus any `env:` key `main` added to or changed in `web-ipx-ops` since the last refresh (compare the two blocks; the deliberate differences are listed in ipx-cd#2405).
+   Before it merges, an Infisical writer compares `/web-ipx-ops` with `/web-ipx-ops-auth0` and copies across any shared key that was added or changed, never `AUTH_SECRET` or an `AUTH_AUTHENTIK_*` key. `JWT_SECRET` must match exactly.
 6. **[HUMAN] Fresh T067** for that PR, then merge it.
 7. Rerun §3 rows FR-002, FR-003 and FR-010, and §4 for any screen that `main` added or changed since the last sweep.
 

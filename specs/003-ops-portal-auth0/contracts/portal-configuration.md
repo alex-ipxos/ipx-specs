@@ -60,7 +60,9 @@ touches auth, which the entry middleware makes the first request of any kind).
 
 Both deployments keep the **same** `FACTORY_TOKEN_ISSUER` and `JWT_SECRET`, which is what makes "no
 factory service needs a configuration change" true (AC-3). The parallel deployment's Auth0 client
-secret lives under its own Infisical key, separate from the current portal's (FR-019).
+secret lives under its own Infisical key, separate from the current portal's (FR-019). Its path
+`/web-ipx-ops-auth0` therefore also holds **copies** of the shared keys (`JWT_SECRET` and the rest),
+not a second mount of `/web-ipx-ops` (decided 2026-11-25).
 
 ## What this contract never permits
 

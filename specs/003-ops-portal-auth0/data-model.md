@@ -149,11 +149,11 @@ Not application data — configuration, in `ipx-cd/dev-ipxosai-services/values-d
 | Property | Current (`web-ipx-ops`) | Parallel (`web-ipx-ops-auth0`) |
 |---|---|---|
 | Image | `web-ipx-ops:<tag>` built from `main`, bumped by automation | the same repository, a tag **built from the feature branch** and pinned by hand. Automation never touches it (FR-028, research.md R11) |
-| Host | `ops.ipxos.dev` | its own, e.g. `ops-auth0.ipxos.dev` |
+| Host | `ops.ipxos.dev` | its own: `ops-auth0.ipxos.dev` (fixed 2026-11-25, ipx-cd#2405) |
 | `AUTH_PROVIDER` | `authentik` (set explicitly; also the default) | `auth0` |
 | Session cookie | as today | **a distinct name** (FR-003) |
 | Auth callback | `/api/auth/callback/authentik` | `/api/auth/callback/auth0` |
-| Secrets | `web-ipx-ops-secrets` | its own secret reference, Infisical `/web-ipx-ops-auth0` (FR-019) |
+| Secrets | `web-ipx-ops-secrets` | its own secret reference, Infisical `/web-ipx-ops-auth0` (FR-019), holding its Auth0 keys, its own `AUTH_SECRET` and **copies** of the shared keys it needs from `/web-ipx-ops`, never an `AUTH_AUTHENTIK_*` key |
 | Provider registration | the Authentik Ops Portal client | its own Auth0 application, `ipx-ops-auth0` (research.md R8, settled; [setup](./auth0-application-setup.md)) |
 | Backing services | the dev factories | **the same ones, the same data** (FR-022) |
 | Withdrawal | — | delete this release only; nothing changes on the other (FR-004, AC-14) |

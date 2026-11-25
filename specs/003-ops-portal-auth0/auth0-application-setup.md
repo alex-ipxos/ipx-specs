@@ -18,7 +18,7 @@ deployment (plan.md → Delivery constraints). Until then this page is the plan.
 | ipxos.ai Google Workspace connection | IPX-9497 runbook §2 | Authentication > Enterprise |
 | `svc-identity` API (RS256, RBAC off, offline access off) | IPX-9497 runbook §3 | Applications > APIs |
 | `Restrict to ipxos.ai` post-login Action, bound to the Login flow | IPX-9497 runbook §5 | Actions > Flows > Login |
-| The parallel portal's host, e.g. `ops-auth0.ipxos.dev` | T044 (`virtualService.host`) | Fixed before step 2, because the callback URL contains it |
+| The parallel portal's host, `ops-auth0.ipxos.dev` (fixed 2026-11-25, ipx-cd#2405) | T044 (`virtualService.host`) | Fixed before step 2, because the callback URL contains it |
 | An Auth0 tenant admin and an Infisical writer for the dev environment | — | — |
 
 The Action runs **tenant-wide** on every login, so the new application is covered by the ipxos.ai
@@ -86,12 +86,18 @@ The parallel release has its own secret reference (T044), so it gets **its own p
 `/web-ipx-ops-auth0`. It does not add keys to `/web-ipx-ops`, so neither portal can read the
 other's secrets (FR-019).
 
+The release mounts **only** this path (ipx-cd#2405), so it also needs its own copies of the shared
+keys the portal reads from `/web-ipx-ops`. Decided 2026-11-25: copy them rather than mount both
+secrets, because mounting `/web-ipx-ops` would hand the parallel portal the Authentik client secret.
+The copies must be kept in step at each refresh (runbook, T064).
+
 | Key | Value | Secret? |
 |---|---|---|
 | `AUTH_AUTH0_ID` | client id (step 8) | treated as secret |
 | `AUTH_AUTH0_SECRET` | client secret (step 8) | **yes** |
 | `AUTH_AUTH0_ISSUER` | `issuer` from `https://ipxos-dev.au.auth0.com/.well-known/openid-configuration`, byte-exact, **trailing slash included** | no, but kept beside the others |
 | `AUTH_SECRET` | a **new** value (`openssl rand -base64 33`), never the current portal's | **yes** |
+| every other key in `/web-ipx-ops` except `AUTH_SECRET` and `AUTH_AUTHENTIK_*` (`JWT_SECRET` and the rest the portal reads) | a **copy** of the current portal's value. `JWT_SECRET` must be identical (AC-3) | as in `/web-ipx-ops` |
 
 `AUTH_PROVIDER=auth0`, `AUTH_AUTH0_AUDIENCE=svc-identity` and `SVC_IDENTITY_API_URL` are not
 secrets. They go in the release's `env:` block in `values-dev.yaml` (T044).
