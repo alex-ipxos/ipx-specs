@@ -16,14 +16,14 @@ When the work below is done, update this file or delete it. It is a pointer, not
 ## Next steps, in order
 
 0. **Housekeeping first** (developer):
-   - **reboot the Mac** (54 days up; TIME_WAIT sockets were stuck, and the stopgap `portrange.first=16384` is lost on reboot anyway)
+   - **reboot the Mac** (still pending as of 2026-11-26, developer will do it later; 54 days up; TIME_WAIT sockets were stuck, and the stopgap `portrange.first=16384` is lost on reboot anyway)
    - after the reboot, start the proxy again if a local run is needed
    - delete the sandbox app `ipx-ops-auth0` in `dev-ipxos-play` once no further sandbox runs are wanted
    - delete the scratchpad `sandbox-auth0-creds.txt`
 1. ~~Check CI on `34c9504`; re-run the governance chain~~ **Done 2026-11-26.** Round 8 in the bundle: finding R8-1 (Try-again loop), fix `34c9504` recorded honestly as orchestrator-inline work (no fixer agent, developer's choice). Pre-audit rerun 0 findings. Independent audit (auditor-1adbd0be) pass-with-follow-ups: R8-A1 low (sequence doc said Try again → `/sign-in`) fixed in `81595d0` and re-checked pass; R8-A2/A3 info, no action. verify-qa pass-with-skips (CI E2E run 45745500141, 373 passed, 2 unrelated flaky; plus the developer's sandbox check of AC-4). verify-gov signed by a separate verifier agent, `sha256:1f3ff3d6…8623`.
 
 1a. **Tick T066 in tasks.md** (the developer does this; the sign-off is already posted).
-2. **Developer decides whether T066 needs a re-run** for the Try-again change (it touches the refusal path, AC-4). The sandbox rehearsal already exercised it with a real Auth0 tenant; CI E2E covers it against the stub.
+2. ~~T066 re-run decision~~ **Decided 2026-11-26 by the developer: no T066 re-run** for the Try-again change; the PASS at `88627a8` stands.
 3. **Get the developer's approval for the live steps**, then T045 (the Auth0 `ipx-ops-auth0` app in `ipxos-dev`, callbacks `https://ops-auth0.ipxos.dev/api/auth/callback/auth0` and `https://ipx-ops.localhost/api/auth/callback/auth0`), T058 (`svc-identity` audience), T059 (Workspace connection) and T060 (Infisical `/web-ipx-ops-auth0`: Auth0 id, secret and issuer, a new `AUTH_SECRET`, copies of the shared keys, no `AUTH_AUTHENTIK_*`). See [auth0-application-setup.md](./auth0-application-setup.md). It is not yet known whether the agent has Auth0 or Infisical access, or whether the developer does these by hand.
 4. **T065 [HUMAN]**: a local run against the real tenant (blocked until IPX-9497 creates `ipxos-dev`; the sandbox rehearsal above passed), using the same setup as T066 (below), with the issuer switched to `https://ipxos-dev.au.auth0.com/` on both the portal and svc-identity.
 5. Then T063 (build the T065 SHA), fill in T044's tag and `enabled: true`, **T067 [HUMAN]** approval, merge (that is the deployment), T047, T048.
